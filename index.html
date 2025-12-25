@@ -2144,57 +2144,74 @@ function drawAttackPreviewLines(targetX, targetY) {
     }
 }
 
-// Fog of War drawing
+// Fog of War - using offscreen canvas
+let fogCanvas = null;
+let fogCtx = null;
+
+function initFogCanvas() {
+    fogCanvas = document.createElement('canvas');
+    fogCanvas.width = W;
+    fogCanvas.height = H;
+    fogCtx = fogCanvas.getContext('2d');
+}
+
 function drawFogOfWar() {
     if (!game.features.fog) return;
 
-    // Create fog canvas overlay
-    ctx.save();
+    // Initialize fog canvas if needed
+    if (!fogCanvas || fogCanvas.width !== W || fogCanvas.height !== H) {
+        initFogCanvas();
+    }
 
-    // Draw full fog first
-    ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
-    ctx.fillRect(0, 0, W, H);
+    // Clear fog canvas and fill with dark fog
+    fogCtx.clearRect(0, 0, W, H);
+    fogCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+    fogCtx.fillRect(0, 0, W, H);
 
-    // Use destination-out to cut holes for player visibility
-    ctx.globalCompositeOperation = 'destination-out';
+    // Use destination-out on the FOG canvas to cut visibility holes
+    fogCtx.globalCompositeOperation = 'destination-out';
 
     // Cut visibility around player planets
     for (const planet of planets) {
         if (planet.owner === PLAYER) {
-            const visRadius = planet.size * 5; // Visibility radius based on planet size
-            const gradient = ctx.createRadialGradient(
-                planet.x, planet.y, planet.size,
+            const visRadius = planet.size * 6;
+            const gradient = fogCtx.createRadialGradient(
+                planet.x, planet.y, planet.size * 0.5,
                 planet.x, planet.y, visRadius
             );
             gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-            gradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.8)');
+            gradient.addColorStop(0.6, 'rgba(0, 0, 0, 1)');
             gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(planet.x, planet.y, visRadius, 0, Math.PI * 2);
-            ctx.fill();
+            fogCtx.fillStyle = gradient;
+            fogCtx.beginPath();
+            fogCtx.arc(planet.x, planet.y, visRadius, 0, Math.PI * 2);
+            fogCtx.fill();
         }
     }
 
     // Also reveal around player's flying particles
     for (const p of flyingParticles) {
         if (p.owner === PLAYER) {
-            const visRadius = 60;
-            const gradient = ctx.createRadialGradient(
+            const visRadius = 80;
+            const gradient = fogCtx.createRadialGradient(
                 p.x, p.y, 5,
                 p.x, p.y, visRadius
             );
             gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
-            gradient.addColorStop(0.6, 'rgba(0, 0, 0, 0.5)');
+            gradient.addColorStop(0.5, 'rgba(0, 0, 0, 0.8)');
             gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
-            ctx.fillStyle = gradient;
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, visRadius, 0, Math.PI * 2);
-            ctx.fill();
+            fogCtx.fillStyle = gradient;
+            fogCtx.beginPath();
+            fogCtx.arc(p.x, p.y, visRadius, 0, Math.PI * 2);
+            fogCtx.fill();
         }
     }
 
-    ctx.restore();
+    // Reset composite operation
+    fogCtx.globalCompositeOperation = 'source-over';
+
+    // Draw the fog layer onto the main canvas
+    ctx.drawImage(fogCanvas, 0, 0);
 }
 
 // Check if a point is visible to the player (for fog of war)
