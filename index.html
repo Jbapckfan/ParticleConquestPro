@@ -509,6 +509,119 @@
             margin-bottom: 4px;
         }
         
+        /* Pause Button */
+        .pause-btn {
+            position: fixed;
+            top: max(12px, env(safe-area-inset-top));
+            right: max(20px, env(safe-area-inset-right));
+            width: 44px;
+            height: 44px;
+            background: rgba(30, 30, 30, 0.8);
+            border: 2px solid #555;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 20px;
+            cursor: pointer;
+            z-index: 150;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .pause-btn:hover {
+            border-color: #0ff;
+            transform: scale(1.1);
+        }
+
+        /* Pause Menu */
+        .pause-menu {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.92);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 250;
+            padding: 20px;
+        }
+
+        .pause-menu h1 {
+            font-size: 48px;
+            color: #fff;
+            margin-bottom: 10px;
+        }
+
+        .pause-menu .pause-subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        .pause-menu-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        .pause-menu-btn {
+            padding: 14px 50px;
+            font-size: 16px;
+            border: 2px solid #444;
+            background: #111;
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 220px;
+            text-align: center;
+        }
+
+        .pause-menu-btn:hover {
+            border-color: #0ff;
+            transform: scale(1.03);
+        }
+
+        .pause-menu-btn.primary {
+            background: linear-gradient(135deg, #0ff, #0af);
+            border: none;
+            color: #000;
+            font-weight: bold;
+        }
+
+        .pause-menu-btn.danger {
+            border-color: #a44;
+        }
+
+        .pause-menu-btn.danger:hover {
+            border-color: #f44;
+            background: rgba(255, 68, 68, 0.1);
+        }
+
+        /* Pause Settings Section */
+        .pause-settings {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 20px;
+            max-width: 350px;
+            width: 100%;
+        }
+
+        .pause-settings h3 {
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+
+        .pause-settings .feature-toggles {
+            justify-content: center;
+        }
+
         /* Selection count indicator */
         .selection-indicator {
             position: fixed;
@@ -528,6 +641,42 @@
 </head>
 <body>
     <canvas id="canvas"></canvas>
+
+    <!-- Pause Button -->
+    <button class="pause-btn hidden" id="pauseBtn" title="Pause (P)">⏸️</button>
+
+    <!-- Pause Menu -->
+    <div class="pause-menu hidden" id="pauseMenu">
+        <h1>⏸️ PAUSED</h1>
+        <p class="pause-subtitle">Game paused - take a breather!</p>
+
+        <div class="pause-menu-buttons">
+            <button class="pause-menu-btn primary" id="resumeBtn">▶️ Resume</button>
+            <button class="pause-menu-btn" id="restartBtn">🔄 Restart Level</button>
+            <button class="pause-menu-btn danger" id="quitBtn">🚪 Quit to Menu</button>
+        </div>
+
+        <div class="pause-settings">
+            <h3>Settings</h3>
+            <div class="feature-toggles" id="pauseFeatureToggles">
+                <div class="feature-toggle" data-feature="stealth">
+                    <span class="toggle-icon">👻</span>
+                    <span class="toggle-label">Stealth</span>
+                    <span class="toggle-check">✓</span>
+                </div>
+                <div class="feature-toggle" data-feature="comets">
+                    <span class="toggle-icon">☄️</span>
+                    <span class="toggle-label">Comets</span>
+                    <span class="toggle-check">✓</span>
+                </div>
+                <div class="feature-toggle" data-feature="fog">
+                    <span class="toggle-icon">🌫️</span>
+                    <span class="toggle-label">Fog</span>
+                    <span class="toggle-check">✓</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="hud">
         <div class="player-info">
@@ -710,7 +859,7 @@ let W, H;
 
 // Game state
 const game = {
-    state: 'menu', // menu, harvest, playing, ended
+    state: 'menu', // menu, harvest, playing, paused, ended
     mode: 'classic', // classic, harvest
     difficulty: 'medium',
     level: 1,
@@ -721,6 +870,7 @@ const game = {
     lastClickTime: 0,
     lastClickedPlanet: null,
     doubleClickThreshold: 300, // ms
+    paused: false,
     // Feature toggles
     features: {
         stealth: false,
@@ -2072,13 +2222,74 @@ function startGame(difficulty) {
     game.level = 1;
     game.activeAbility = null;
     game.selectedPlanets = [];
+    game.paused = false;
     playerHarvested = 0;
     enemyHarvested = 0;
-    
+
     document.getElementById('menu').classList.add('hidden');
     document.getElementById('resultScreen').classList.add('hidden');
-    
+    document.getElementById('pauseMenu').classList.add('hidden');
+    document.getElementById('pauseBtn').classList.remove('hidden');
+
     generateLevel();
+}
+
+function pauseGame() {
+    if (game.state !== 'playing' && game.state !== 'harvest') return;
+    game.paused = true;
+    document.getElementById('pauseMenu').classList.remove('hidden');
+    document.getElementById('pauseBtn').classList.add('hidden');
+
+    // Sync feature toggles in pause menu
+    syncPauseFeatureToggles();
+}
+
+function resumeGame() {
+    game.paused = false;
+    document.getElementById('pauseMenu').classList.add('hidden');
+    document.getElementById('pauseBtn').classList.remove('hidden');
+}
+
+function restartLevel() {
+    game.paused = false;
+    document.getElementById('pauseMenu').classList.add('hidden');
+    document.getElementById('pauseBtn').classList.remove('hidden');
+    generateLevel();
+}
+
+function quitToMenu() {
+    game.paused = false;
+    game.state = 'menu';
+    document.getElementById('pauseMenu').classList.add('hidden');
+    document.getElementById('pauseBtn').classList.add('hidden');
+    document.getElementById('menu').classList.remove('hidden');
+
+    // Sync main menu feature toggles
+    syncMenuFeatureToggles();
+}
+
+function syncPauseFeatureToggles() {
+    document.querySelectorAll('#pauseFeatureToggles .feature-toggle').forEach(toggle => {
+        const feature = toggle.dataset.feature;
+        toggle.classList.toggle('active', game.features[feature]);
+    });
+}
+
+function syncMenuFeatureToggles() {
+    document.querySelectorAll('.menu .feature-toggle').forEach(toggle => {
+        const feature = toggle.dataset.feature;
+        toggle.classList.toggle('active', game.features[feature]);
+    });
+}
+
+function togglePause() {
+    if (game.state !== 'playing' && game.state !== 'harvest') return;
+
+    if (game.paused) {
+        resumeGame();
+    } else {
+        pauseGame();
+    }
 }
 
 function updateStats() {
@@ -2257,16 +2468,19 @@ function animate(time) {
     }
     
     if (game.state === 'harvest') {
-        harvestParticles = harvestParticles.filter(p => p.update(dt));
-        effects = effects.filter(e => e.update(dt));
-        
-        updateHarvestAI(dt);
-        checkHarvestComplete();
-        
+        // Only update if not paused
+        if (!game.paused) {
+            harvestParticles = harvestParticles.filter(p => p.update(dt));
+            effects = effects.filter(e => e.update(dt));
+            updateHarvestAI(dt);
+            checkHarvestComplete();
+        }
+
+        // Always draw
         for (const planet of planets) planet.draw();
         for (const p of harvestParticles) p.draw();
         for (const e of effects) e.draw();
-        
+
         if (selectedHarvestParticle && !selectedHarvestParticle.grabbed) {
             ctx.strokeStyle = '#fff';
             ctx.lineWidth = 2;
@@ -2276,30 +2490,40 @@ function animate(time) {
             ctx.stroke();
             ctx.setLineDash([]);
         }
+
+        // Draw pause overlay hint
+        if (game.paused) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(0, 0, W, H);
+        }
     }
-    
+
     if (game.state === 'playing') {
-        for (const planet of planets) planet.update(dt);
-        flyingParticles = flyingParticles.filter(p => p.update(dt));
-        effects = effects.filter(e => e.update(dt));
+        // Only update if not paused
+        if (!game.paused) {
+            for (const planet of planets) planet.update(dt);
+            flyingParticles = flyingParticles.filter(p => p.update(dt));
+            effects = effects.filter(e => e.update(dt));
 
-        // Update comets
-        if (game.features.comets) {
-            comets = comets.filter(c => c.update(dt));
+            // Update comets
+            if (game.features.comets) {
+                comets = comets.filter(c => c.update(dt));
 
-            // Spawn comet showers periodically
-            const now = Date.now();
-            if (now - lastCometShower > COMET_SHOWER_INTERVAL) {
-                lastCometShower = now;
-                spawnCometShower();
+                // Spawn comet showers periodically
+                const now = Date.now();
+                if (now - lastCometShower > COMET_SHOWER_INTERVAL) {
+                    lastCometShower = now;
+                    spawnCometShower();
+                }
             }
+
+            updateAI(dt);
+            updateAbilities(realDt);
+            checkWinCondition();
+            updateStats();
         }
 
-        updateAI(dt);
-        updateAbilities(realDt);
-        checkWinCondition();
-        updateStats();
-
+        // Always draw
         drawWormholeConnections();
 
         for (const planet of planets) planet.draw();
@@ -2310,12 +2534,18 @@ function animate(time) {
         for (const c of comets) c.draw();
 
         // Attack preview lines when planets are selected and mouse is moving
-        if (game.selectedPlanets.length > 0 && currentTouch) {
+        if (game.selectedPlanets.length > 0 && currentTouch && !game.paused) {
             drawAttackPreviewLines(currentTouch.x, currentTouch.y);
         }
 
         // Draw fog of war on top
         drawFogOfWar();
+
+        // Draw pause overlay hint
+        if (game.paused) {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+            ctx.fillRect(0, 0, W, H);
+        }
     }
     
     if (game.state === 'menu' || game.state === 'ended') {
@@ -2328,8 +2558,11 @@ function animate(time) {
 
 // Input handling with double-click detection
 function handleStart(x, y) {
+    // Ignore input when paused
+    if (game.paused) return;
+
     const now = Date.now();
-    
+
     // Harvest mode input
     if (game.state === 'harvest') {
         if (selectedHarvestParticle && !selectedHarvestParticle.grabbed) {
@@ -2429,20 +2662,40 @@ canvas.addEventListener('touchmove', e => { e.preventDefault(); handleMove(e.tou
 
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
-    if (game.state !== 'playing') return;
+    // Pause toggle works in playing and harvest states
+    if (e.key === 'p' || e.key === 'P') {
+        togglePause();
+        return;
+    }
+
+    // Escape can unpause or clear selection
+    if (e.key === 'Escape') {
+        if (game.paused) {
+            resumeGame();
+            return;
+        }
+        if (game.state === 'playing' || game.state === 'harvest') {
+            if (game.activeAbility || game.selectedPlanets.length > 0) {
+                game.activeAbility = null;
+                game.selectedPlanets = [];
+                updateSelectionIndicator();
+                document.getElementById('gameStatus').textContent = 'Select your planet';
+            } else {
+                pauseGame();
+            }
+        }
+        return;
+    }
+
+    // Other shortcuts only work when not paused and in playing state
+    if (game.state !== 'playing' || game.paused) return;
 
     if (e.key === '1') activateAbility('boost');
     if (e.key === '2') activateAbility('shield');
     if (e.key === '3') activateAbility('emp');
     if (e.key === '4') activateAbility('nuke');
     if (e.key === '5') activateAbility('stealth');
-    if (e.key === 'a' || e.key === 'A') selectAllPlayerPlanets(); // 'A' for select All
-    if (e.key === 'Escape') {
-        game.activeAbility = null;
-        game.selectedPlanets = [];
-        updateSelectionIndicator();
-        document.getElementById('gameStatus').textContent = 'Select your planet';
-    }
+    if (e.key === 'a' || e.key === 'A') selectAllPlayerPlanets();
 });
 
 // UI Events
@@ -2490,14 +2743,31 @@ document.querySelectorAll('.ability-btn').forEach(btn => {
     });
 });
 
-// Feature toggles
+// Feature toggles (both main menu and pause menu)
 document.querySelectorAll('.feature-toggle').forEach(toggle => {
     toggle.addEventListener('click', function() {
         const feature = this.dataset.feature;
         game.features[feature] = !game.features[feature];
-        this.classList.toggle('active', game.features[feature]);
+
+        // Sync all toggles with the same feature
+        document.querySelectorAll(`.feature-toggle[data-feature="${feature}"]`).forEach(t => {
+            t.classList.toggle('active', game.features[feature]);
+        });
+
+        // Update stealth button visibility if toggling stealth
+        if (feature === 'stealth') {
+            document.getElementById('stealthBtn').style.display = game.features.stealth ? 'flex' : 'none';
+        }
     });
 });
+
+// Pause button
+document.getElementById('pauseBtn').addEventListener('click', pauseGame);
+
+// Pause menu buttons
+document.getElementById('resumeBtn').addEventListener('click', resumeGame);
+document.getElementById('restartBtn').addEventListener('click', restartLevel);
+document.getElementById('quitBtn').addEventListener('click', quitToMenu);
 
 // Init
 window.addEventListener('resize', resize);
