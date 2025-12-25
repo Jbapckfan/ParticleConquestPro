@@ -622,6 +622,271 @@
             justify-content: center;
         }
 
+        /* Stats Screen */
+        .stats-screen {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .stats-screen h1 {
+            font-size: 36px;
+            color: #0ff;
+            margin-bottom: 20px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 15px;
+            max-width: 600px;
+            width: 100%;
+            margin-bottom: 25px;
+        }
+
+        .stat-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid #333;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+        }
+
+        .stat-card .stat-value {
+            font-size: 28px;
+            font-weight: bold;
+            color: #0ff;
+        }
+
+        .stat-card .stat-label {
+            font-size: 11px;
+            color: #888;
+            text-transform: uppercase;
+            margin-top: 5px;
+        }
+
+        .stats-close-btn {
+            padding: 12px 40px;
+            font-size: 16px;
+            background: #222;
+            border: 2px solid #444;
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .stats-close-btn:hover {
+            border-color: #0ff;
+        }
+
+        /* Daily Challenges Panel */
+        .daily-panel {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid #333;
+            border-radius: 12px;
+            padding: 15px;
+            margin-top: 15px;
+            max-width: 350px;
+            width: 100%;
+        }
+
+        .daily-panel h3 {
+            color: #ffd700;
+            font-size: 14px;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+
+        .challenge-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 8px;
+            margin-bottom: 8px;
+        }
+
+        .challenge-item.completed {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid #0a0;
+        }
+
+        .challenge-icon {
+            font-size: 20px;
+        }
+
+        .challenge-info {
+            flex: 1;
+        }
+
+        .challenge-title {
+            font-size: 12px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .challenge-desc {
+            font-size: 10px;
+            color: #888;
+        }
+
+        .challenge-check {
+            font-size: 18px;
+            color: #0f0;
+        }
+
+        /* Multiplayer Lobby */
+        .multiplayer-lobby {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 300;
+            padding: 20px;
+        }
+
+        .multiplayer-lobby h1 {
+            font-size: 36px;
+            color: #0ff;
+            margin-bottom: 10px;
+        }
+
+        .lobby-status {
+            color: #888;
+            margin-bottom: 25px;
+        }
+
+        .room-code-display {
+            font-size: 48px;
+            font-family: monospace;
+            color: #ffd700;
+            letter-spacing: 8px;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: 2px solid #ffd700;
+            margin-bottom: 20px;
+        }
+
+        .join-code-input {
+            font-size: 24px;
+            font-family: monospace;
+            text-align: center;
+            letter-spacing: 5px;
+            background: #111;
+            border: 2px solid #444;
+            color: #fff;
+            padding: 12px 20px;
+            border-radius: 10px;
+            width: 200px;
+            text-transform: uppercase;
+        }
+
+        .join-code-input:focus {
+            border-color: #0ff;
+            outline: none;
+        }
+
+        .lobby-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .lobby-btn {
+            padding: 12px 30px;
+            font-size: 16px;
+            border: 2px solid #444;
+            background: #111;
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+        }
+
+        .lobby-btn:hover {
+            border-color: #0ff;
+        }
+
+        .lobby-btn.primary {
+            background: linear-gradient(135deg, #0ff, #0af);
+            border: none;
+            color: #000;
+            font-weight: bold;
+        }
+
+        /* Menu buttons for new features */
+        .menu-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .menu-action-btn {
+            padding: 10px 20px;
+            font-size: 13px;
+            background: #111;
+            border: 1px solid #444;
+            color: #aaa;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .menu-action-btn:hover {
+            border-color: #0ff;
+            color: #fff;
+        }
+
+        /* Sound toggle */
+        .sound-toggle {
+            position: fixed;
+            top: max(12px, env(safe-area-inset-top));
+            left: max(20px, env(safe-area-inset-left));
+            width: 40px;
+            height: 40px;
+            background: rgba(30, 30, 30, 0.8);
+            border: 2px solid #555;
+            border-radius: 10px;
+            color: #fff;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 150;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sound-toggle:hover {
+            border-color: #0ff;
+        }
+
+        .sound-toggle.muted {
+            color: #666;
+        }
+
+        /* Ad-free badge */
+        .ad-free-badge {
+            position: fixed;
+            bottom: max(10px, env(safe-area-inset-bottom));
+            right: max(10px, env(safe-area-inset-right));
+            font-size: 9px;
+            color: #444;
+            z-index: 50;
+        }
+
         /* Selection count indicator */
         .selection-indicator {
             position: fixed;
@@ -677,6 +942,40 @@
             </div>
         </div>
     </div>
+
+    <!-- Sound Toggle -->
+    <button class="sound-toggle" id="soundToggle" title="Toggle Sound">🔊</button>
+
+    <!-- Stats Screen -->
+    <div class="stats-screen hidden" id="statsScreen">
+        <h1>📊 Your Stats</h1>
+        <div class="stats-grid" id="statsGrid"></div>
+        <button class="stats-close-btn" id="statsCloseBtn">Close</button>
+    </div>
+
+    <!-- Multiplayer Lobby -->
+    <div class="multiplayer-lobby hidden" id="multiplayerLobby">
+        <h1 id="lobbyTitle">🌐 Multiplayer</h1>
+        <p class="lobby-status" id="lobbyStatus">Choose an option</p>
+
+        <div id="roomCodeContainer" class="hidden">
+            <div class="room-code-display" id="roomCodeDisplay">------</div>
+            <p style="color:#888; font-size:12px;">Share this code with your friend</p>
+        </div>
+
+        <div id="joinCodeContainer">
+            <input type="text" class="join-code-input" id="joinCodeInput" placeholder="ENTER CODE" maxlength="6">
+        </div>
+
+        <div class="lobby-buttons">
+            <button class="lobby-btn" id="lobbyBackBtn">← Back</button>
+            <button class="lobby-btn primary" id="lobbyHostBtn">Host Game</button>
+            <button class="lobby-btn primary" id="lobbyJoinBtn">Join Game</button>
+        </div>
+    </div>
+
+    <!-- Ad-free Badge -->
+    <div class="ad-free-badge">✨ Ad-free • No login required</div>
 
     <div class="hud">
         <div class="player-info">
@@ -843,6 +1142,18 @@
             ☄️ <strong>Comet Showers</strong> — Destroys flying particles<br>
             🌫️ <strong>Fog of War</strong> — Limited visibility
         </div>
+
+        <!-- Daily Challenges -->
+        <div class="daily-panel" id="dailyPanel">
+            <h3>🎯 Daily Challenges</h3>
+            <div id="challengesList"></div>
+        </div>
+
+        <!-- Menu Actions -->
+        <div class="menu-actions">
+            <button class="menu-action-btn" id="statsBtn">📊 Stats</button>
+            <button class="menu-action-btn" id="multiplayerBtn">🌐 Multiplayer</button>
+        </div>
     </div>
 
     <div class="result-screen hidden" id="resultScreen">
@@ -856,6 +1167,584 @@ const canvas = document.getElementById('canvas');
 const ctx = canvas.getContext('2d');
 
 let W, H;
+
+// ==================== LOCALSTORAGE & STATS SYSTEM ====================
+const STORAGE_KEY = 'particleConquestPro';
+
+const defaultStats = {
+    gamesPlayed: 0,
+    gamesWon: 0,
+    gamesLost: 0,
+    planetsConquered: 0,
+    planetsLost: 0,
+    unitsDeployed: 0,
+    unitsDestroyed: 0,
+    highestLevel: 1,
+    totalPlayTime: 0, // in seconds
+    abilitiesUsed: 0,
+    perfectWins: 0, // wins without losing a planet
+    fastestWin: null, // in seconds
+    currentStreak: 0,
+    bestStreak: 0,
+    dailyChallenges: {},
+    lastDailyDate: null,
+    settings: {
+        soundEnabled: true,
+        musicEnabled: true,
+        volume: 0.7
+    },
+    features: {
+        stealth: false,
+        comets: false,
+        fog: false
+    }
+};
+
+let playerStats = loadStats();
+
+function loadStats() {
+    try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+            const parsed = JSON.parse(saved);
+            return { ...defaultStats, ...parsed, settings: { ...defaultStats.settings, ...parsed.settings }, features: { ...defaultStats.features, ...parsed.features } };
+        }
+    } catch (e) { console.warn('Failed to load stats:', e); }
+    return { ...defaultStats };
+}
+
+function saveStats() {
+    try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(playerStats));
+    } catch (e) { console.warn('Failed to save stats:', e); }
+}
+
+// ==================== SOUND EFFECTS SYSTEM ====================
+const AudioCtx = window.AudioContext || window.webkitAudioContext;
+let audioCtx = null;
+
+function initAudio() {
+    if (!audioCtx) {
+        audioCtx = new AudioCtx();
+    }
+    if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+    }
+}
+
+function playSound(type, options = {}) {
+    if (!playerStats.settings.soundEnabled || !audioCtx) return;
+
+    const vol = playerStats.settings.volume * (options.volume || 1);
+    const now = audioCtx.currentTime;
+
+    try {
+        switch(type) {
+            case 'select': {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.1);
+                gain.gain.setValueAtTime(vol * 0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+                osc.start(now);
+                osc.stop(now + 0.15);
+                break;
+            }
+            case 'attack': {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(200, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.2);
+                gain.gain.setValueAtTime(vol * 0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                osc.start(now);
+                osc.stop(now + 0.2);
+                break;
+            }
+            case 'capture': {
+                [0, 0.1, 0.2].forEach((delay, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.setValueAtTime([523, 659, 784][i], now + delay);
+                    gain.gain.setValueAtTime(vol * 0.25, now + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.3);
+                    osc.start(now + delay);
+                    osc.stop(now + delay + 0.3);
+                });
+                break;
+            }
+            case 'lose': {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.type = 'sawtooth';
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(400, now);
+                osc.frequency.exponentialRampToValueAtTime(100, now + 0.4);
+                gain.gain.setValueAtTime(vol * 0.3, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.4);
+                osc.start(now);
+                osc.stop(now + 0.4);
+                break;
+            }
+            case 'victory': {
+                [0, 0.15, 0.3, 0.45].forEach((delay, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.setValueAtTime([523, 659, 784, 1047][i], now + delay);
+                    gain.gain.setValueAtTime(vol * 0.3, now + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.4);
+                    osc.start(now + delay);
+                    osc.stop(now + delay + 0.4);
+                });
+                break;
+            }
+            case 'defeat': {
+                [0, 0.2, 0.4].forEach((delay, i) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.setValueAtTime([300, 200, 100][i], now + delay);
+                    gain.gain.setValueAtTime(vol * 0.25, now + delay);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + delay + 0.3);
+                    osc.start(now + delay);
+                    osc.stop(now + delay + 0.3);
+                });
+                break;
+            }
+            case 'ability': {
+                const osc = audioCtx.createOscillator();
+                const osc2 = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                osc2.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(600, now);
+                osc2.frequency.setValueAtTime(900, now);
+                osc.frequency.exponentialRampToValueAtTime(1200, now + 0.15);
+                osc2.frequency.exponentialRampToValueAtTime(1800, now + 0.15);
+                gain.gain.setValueAtTime(vol * 0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.2);
+                osc.start(now);
+                osc2.start(now);
+                osc.stop(now + 0.2);
+                osc2.stop(now + 0.2);
+                break;
+            }
+            case 'comet': {
+                const noise = audioCtx.createBufferSource();
+                const buffer = audioCtx.createBuffer(1, audioCtx.sampleRate * 0.5, audioCtx.sampleRate);
+                const data = buffer.getChannelData(0);
+                for (let i = 0; i < data.length; i++) data[i] = Math.random() * 2 - 1;
+                noise.buffer = buffer;
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.setValueAtTime(2000, now);
+                filter.frequency.exponentialRampToValueAtTime(200, now + 0.5);
+                const gain = audioCtx.createGain();
+                noise.connect(filter);
+                filter.connect(gain);
+                gain.connect(audioCtx.destination);
+                gain.gain.setValueAtTime(vol * 0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.5);
+                noise.start(now);
+                noise.stop(now + 0.5);
+                break;
+            }
+            case 'click': {
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
+                osc.connect(gain);
+                gain.connect(audioCtx.destination);
+                osc.frequency.setValueAtTime(1000, now);
+                gain.gain.setValueAtTime(vol * 0.15, now);
+                gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                osc.start(now);
+                osc.stop(now + 0.05);
+                break;
+            }
+        }
+    } catch (e) { console.warn('Sound error:', e); }
+}
+
+// ==================== DAILY CHALLENGES SYSTEM ====================
+function getTodayKey() {
+    return new Date().toISOString().split('T')[0];
+}
+
+function getDailySeed() {
+    const today = getTodayKey();
+    let hash = 0;
+    for (let i = 0; i < today.length; i++) {
+        hash = ((hash << 5) - hash) + today.charCodeAt(i);
+        hash |= 0;
+    }
+    return Math.abs(hash);
+}
+
+function generateDailyChallenges() {
+    const seed = getDailySeed();
+    const challenges = [
+        { id: 'speed_demon', title: '⚡ Speed Demon', desc: 'Win a game in under 2 minutes', check: (g) => g.gameTime < 120 && g.won, reward: 'Fast fingers!' },
+        { id: 'domination', title: '👑 Domination', desc: 'Control all planets at once', check: (g) => g.allPlanetsOwned, reward: 'Total control!' },
+        { id: 'underdog', title: '🐕 Underdog', desc: 'Win on Hard difficulty', check: (g) => g.difficulty === 'hard' && g.won, reward: 'Against the odds!' },
+        { id: 'pacifist_start', title: '🕊️ Patient General', desc: 'Win without attacking for first 30 seconds', check: (g) => g.noEarlyAttack && g.won, reward: 'Patience pays!' },
+        { id: 'ability_master', title: '🎯 Ability Master', desc: 'Use 3 different abilities in one game', check: (g) => g.abilitiesUsedTypes >= 3, reward: 'Tactical genius!' },
+        { id: 'perfect_win', title: '💎 Perfect Victory', desc: 'Win without losing any planet', check: (g) => g.perfectWin && g.won, reward: 'Flawless!' },
+        { id: 'harvest_king', title: '🌾 Harvest King', desc: 'Collect 60+ particles in Harvest mode', check: (g) => g.mode === 'harvest' && g.harvested >= 60, reward: 'Master collector!' },
+        { id: 'fog_master', title: '🌫️ Fog Master', desc: 'Win with Fog of War enabled', check: (g) => g.fogEnabled && g.won, reward: 'Blind victory!' },
+        { id: 'nuke_happy', title: '☢️ Nuclear Option', desc: 'Use Nuke ability 3 times in one game', check: (g) => g.nukesUsed >= 3, reward: 'Boom!' },
+        { id: 'streak', title: '🔥 On Fire', desc: 'Win 3 games in a row', check: (g) => playerStats.currentStreak >= 3, reward: 'Unstoppable!' }
+    ];
+
+    // Use seed to pick 3 challenges
+    const shuffled = challenges.sort((a, b) => {
+        const hashA = (seed * a.id.charCodeAt(0)) % 1000;
+        const hashB = (seed * b.id.charCodeAt(0)) % 1000;
+        return hashA - hashB;
+    });
+
+    return shuffled.slice(0, 3);
+}
+
+let dailyChallenges = [];
+let currentGameStats = {};
+
+function initDailyChallenges() {
+    const today = getTodayKey();
+    if (playerStats.lastDailyDate !== today) {
+        playerStats.lastDailyDate = today;
+        playerStats.dailyChallenges[today] = { completed: [] };
+        saveStats();
+    }
+    dailyChallenges = generateDailyChallenges();
+}
+
+function resetCurrentGameStats() {
+    currentGameStats = {
+        startTime: Date.now(),
+        gameTime: 0,
+        won: false,
+        difficulty: game.difficulty,
+        mode: game.mode,
+        allPlanetsOwned: false,
+        noEarlyAttack: true,
+        firstAttackTime: null,
+        abilitiesUsedTypes: new Set(),
+        perfectWin: true,
+        planetsLostThisGame: 0,
+        harvested: 0,
+        fogEnabled: game.features.fog,
+        nukesUsed: 0
+    };
+}
+
+function checkDailyChallenges() {
+    const today = getTodayKey();
+    if (!playerStats.dailyChallenges[today]) {
+        playerStats.dailyChallenges[today] = { completed: [] };
+    }
+
+    const completed = playerStats.dailyChallenges[today].completed;
+    let newlyCompleted = [];
+
+    dailyChallenges.forEach(challenge => {
+        if (!completed.includes(challenge.id) && challenge.check(currentGameStats)) {
+            completed.push(challenge.id);
+            newlyCompleted.push(challenge);
+        }
+    });
+
+    if (newlyCompleted.length > 0) {
+        saveStats();
+        newlyCompleted.forEach(c => {
+            showFloatText(W / 2, H / 3, `🏆 ${c.title}`, '#ffd700');
+        });
+    }
+}
+
+// ==================== MULTIPLAYER SYSTEM (PeerJS) ====================
+let peer = null;
+let conn = null;
+let isHost = false;
+let multiplayerActive = false;
+let opponentName = 'Opponent';
+let roomCode = '';
+
+function generateRoomCode() {
+    const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+    let code = '';
+    for (let i = 0; i < 6; i++) code += chars[Math.floor(Math.random() * chars.length)];
+    return code;
+}
+
+async function initPeerJS() {
+    return new Promise((resolve, reject) => {
+        // Load PeerJS from CDN if not loaded
+        if (typeof Peer === 'undefined') {
+            const script = document.createElement('script');
+            script.src = 'https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js';
+            script.onload = () => resolve();
+            script.onerror = () => reject(new Error('Failed to load PeerJS'));
+            document.head.appendChild(script);
+        } else {
+            resolve();
+        }
+    });
+}
+
+async function hostGame() {
+    try {
+        await initPeerJS();
+        roomCode = generateRoomCode();
+        peer = new Peer('pcp-' + roomCode);
+
+        peer.on('open', id => {
+            isHost = true;
+            showMultiplayerLobby(true);
+        });
+
+        peer.on('connection', connection => {
+            conn = connection;
+            setupConnection();
+        });
+
+        peer.on('error', err => {
+            console.error('Peer error:', err);
+            showFloatText(W / 2, H / 2, 'Connection error!', '#f44');
+        });
+    } catch (e) {
+        console.error('Failed to init multiplayer:', e);
+    }
+}
+
+async function joinGame(code) {
+    try {
+        await initPeerJS();
+        roomCode = code.toUpperCase();
+        peer = new Peer();
+
+        peer.on('open', () => {
+            conn = peer.connect('pcp-' + roomCode);
+            conn.on('open', () => {
+                isHost = false;
+                setupConnection();
+            });
+        });
+
+        peer.on('error', err => {
+            console.error('Peer error:', err);
+            showFloatText(W / 2, H / 2, 'Room not found!', '#f44');
+        });
+    } catch (e) {
+        console.error('Failed to join:', e);
+    }
+}
+
+function setupConnection() {
+    multiplayerActive = true;
+
+    conn.on('data', data => {
+        handleMultiplayerData(data);
+    });
+
+    conn.on('close', () => {
+        multiplayerActive = false;
+        showFloatText(W / 2, H / 2, 'Opponent disconnected', '#f44');
+        endMultiplayerGame();
+    });
+
+    if (isHost) {
+        // Host starts the game
+        showFloatText(W / 2, H / 2, 'Opponent joined!', '#0f0');
+        setTimeout(() => startMultiplayerGame(), 1000);
+    } else {
+        showFloatText(W / 2, H / 2, 'Connected!', '#0f0');
+    }
+}
+
+function sendMultiplayerData(data) {
+    if (conn && conn.open) {
+        conn.send(data);
+    }
+}
+
+function handleMultiplayerData(data) {
+    switch(data.type) {
+        case 'gameState':
+            // Sync game state from host
+            if (!isHost) {
+                syncGameState(data.state);
+            }
+            break;
+        case 'attack':
+            // Opponent sent an attack
+            executeOpponentAttack(data);
+            break;
+        case 'ability':
+            // Opponent used an ability
+            executeOpponentAbility(data);
+            break;
+        case 'sync':
+            // Periodic sync
+            if (!isHost) {
+                syncPlanets(data.planets);
+            }
+            break;
+    }
+}
+
+function syncGameState(state) {
+    // Sync initial game state
+    planets.forEach((p, i) => {
+        if (state.planets[i]) {
+            p.units = state.planets[i].units;
+            p.owner = state.planets[i].owner;
+        }
+    });
+}
+
+function syncPlanets(planetData) {
+    planetData.forEach((pd, i) => {
+        if (planets[i]) {
+            planets[i].units = pd.units;
+            planets[i].owner = pd.owner;
+        }
+    });
+}
+
+function executeOpponentAttack(data) {
+    const source = planets[data.sourceIdx];
+    const target = planets[data.targetIdx];
+    if (source && target) {
+        const units = Math.floor(source.units * (data.percent / 100));
+        source.units -= units;
+        for (let i = 0; i < units; i++) {
+            setTimeout(() => {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = source.size + 5;
+                flyingParticles.push(new FlyingParticle(
+                    source.x + Math.cos(angle) * dist,
+                    source.y + Math.sin(angle) * dist,
+                    target,
+                    ENEMY
+                ));
+            }, i * 30);
+        }
+    }
+}
+
+function executeOpponentAbility(data) {
+    // Handle opponent ability usage
+    showFloatText(W / 2, 100, `Opponent used ${data.ability}!`, '#f44');
+}
+
+function startMultiplayerGame() {
+    game.state = 'playing';
+    document.getElementById('multiplayerLobby').classList.add('hidden');
+    document.getElementById('menu').classList.add('hidden');
+    document.getElementById('pauseBtn').classList.remove('hidden');
+
+    // Generate level with fixed seed for both players
+    const mpSeed = roomCode.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
+    generateMultiplayerLevel(mpSeed);
+
+    if (isHost) {
+        // Send initial state to opponent
+        setTimeout(() => {
+            sendMultiplayerData({
+                type: 'gameState',
+                state: {
+                    planets: planets.map(p => ({ units: p.units, owner: p.owner, x: p.x, y: p.y }))
+                }
+            });
+        }, 500);
+    }
+}
+
+function generateMultiplayerLevel(seed) {
+    // Simple seeded random
+    let s = seed;
+    const random = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+
+    planets = [];
+    flyingParticles = [];
+    effects = [];
+    comets = [];
+
+    const numPlanets = 8;
+    const positions = [];
+    const minDist = 130;
+    const margin = 80;
+
+    for (let i = 0; i < numPlanets; i++) {
+        let x, y, valid;
+        let attempts = 0;
+        do {
+            valid = true;
+            x = margin + random() * (W - margin * 2);
+            y = margin + random() * (H - margin * 2);
+            for (const pos of positions) {
+                const dx = x - pos.x, dy = y - pos.y;
+                if (Math.sqrt(dx*dx + dy*dy) < minDist) { valid = false; break; }
+            }
+            attempts++;
+        } while (!valid && attempts < 100);
+
+        positions.push({ x, y });
+        const size = 25 + random() * 15;
+        const planet = new Planet(x, y, size, 'normal');
+
+        if (i === 0) {
+            planet.owner = PLAYER;
+            planet.units = 30;
+        } else if (i === numPlanets - 1) {
+            planet.owner = ENEMY;
+            planet.units = 30;
+        } else {
+            planet.owner = NEUTRAL;
+            planet.units = 10 + Math.floor(random() * 20);
+        }
+        planets.push(planet);
+    }
+
+    game.state = 'playing';
+    document.getElementById('levelInfo').textContent = 'MULTIPLAYER';
+}
+
+function endMultiplayerGame() {
+    multiplayerActive = false;
+    if (peer) peer.destroy();
+    peer = null;
+    conn = null;
+    document.getElementById('multiplayerLobby').classList.add('hidden');
+}
+
+function showMultiplayerLobby(hosting) {
+    const lobby = document.getElementById('multiplayerLobby');
+    lobby.classList.remove('hidden');
+    document.getElementById('menu').classList.add('hidden');
+
+    if (hosting) {
+        document.getElementById('lobbyTitle').textContent = 'Hosting Game';
+        document.getElementById('roomCodeDisplay').textContent = roomCode;
+        document.getElementById('roomCodeDisplay').parentElement.classList.remove('hidden');
+        document.getElementById('joinCodeInput').parentElement.classList.add('hidden');
+        document.getElementById('lobbyStatus').textContent = 'Waiting for opponent...';
+    }
+}
 
 // Game state
 const game = {
@@ -1415,13 +2304,29 @@ class FlyingParticle {
                     const prevOwner = this.target.owner;
                     this.target.owner = this.owner;
                     this.target.units = 1;
-                    
+
+                    // Track capture stats and play sounds
+                    if (this.owner === PLAYER) {
+                        playerStats.planetsConquered++;
+                        playSound('capture');
+
+                        // Check if all planets owned for daily challenge
+                        if (planets.every(p => p.owner === PLAYER)) {
+                            currentGameStats.allPlanetsOwned = true;
+                        }
+                    } else if (prevOwner === PLAYER) {
+                        playerStats.planetsLost++;
+                        currentGameStats.perfectWin = false;
+                        currentGameStats.planetsLostThisGame++;
+                        playSound('lose');
+                    }
+
                     effects.push(new Effect('capture', this.target.x, this.target.y, {
                         duration: 0.8,
                         radius: this.target.size,
                         color: COLORS[this.owner].main
                     }));
-                    
+
                     showFloatText(this.target.x, this.target.y, 'CAPTURED!', COLORS[this.owner].main);
                 }
             }
@@ -1617,6 +2522,7 @@ class Comet {
 function spawnCometShower() {
     const numComets = 5 + Math.floor(Math.random() * 8);
     showFloatText(W / 2, 100, '☄️ COMET SHOWER!', '#ff8844');
+    playSound('comet');
 
     for (let i = 0; i < numComets; i++) {
         setTimeout(() => {
@@ -1769,9 +2675,10 @@ function togglePlanetSelection(planet) {
     } else {
         // Select
         game.selectedPlanets.push(planet);
+        playSound('select');
     }
     updateSelectionIndicator();
-    
+
     if (game.selectedPlanets.length > 0) {
         document.getElementById('gameStatus').textContent = `${game.selectedPlanets.length} planet${game.selectedPlanets.length > 1 ? 's' : ''} selected - tap target`;
     } else {
@@ -1996,13 +2903,23 @@ function sendUnits(from, to, percent) {
 // Unified attack from all selected planets
 function sendUnifiedAttack(target, percent) {
     if (game.selectedPlanets.length === 0) return;
-    
+
+    playSound('attack');
+
+    // Track early attack for daily challenge
+    if (currentGameStats.firstAttackTime === null) {
+        currentGameStats.firstAttackTime = (Date.now() - currentGameStats.startTime) / 1000;
+        if (currentGameStats.firstAttackTime < 30) {
+            currentGameStats.noEarlyAttack = false;
+        }
+    }
+
     for (const planet of game.selectedPlanets) {
         if (planet !== target && planet.units >= 1) {
             sendUnits(planet, target, percent);
         }
     }
-    
+
     // Clear selection after attack
     game.selectedPlanets = [];
     updateSelectionIndicator();
@@ -2104,6 +3021,17 @@ function activateAbility(abilityName) {
     // Stealth requires the feature to be enabled
     if (abilityName === 'stealth' && !game.features.stealth) return;
 
+    // Track ability usage
+    playerStats.abilitiesUsed++;
+    if (currentGameStats.abilitiesUsedTypes) {
+        currentGameStats.abilitiesUsedTypes.add(abilityName);
+    }
+    if (abilityName === 'nuke') {
+        currentGameStats.nukesUsed = (currentGameStats.nukesUsed || 0) + 1;
+    }
+
+    playSound('ability');
+
     switch (abilityName) {
         case 'boost':
             ab.active = true;
@@ -2198,11 +3126,50 @@ function checkWinCondition() {
 
 function endGame(victory) {
     game.state = 'ended';
-    
+
+    // Update game stats
+    currentGameStats.gameTime = (Date.now() - currentGameStats.startTime) / 1000;
+    currentGameStats.won = victory;
+    currentGameStats.abilitiesUsedTypes = currentGameStats.abilitiesUsedTypes.size;
+
+    // Update player stats
+    playerStats.gamesPlayed++;
+    playerStats.totalPlayTime += currentGameStats.gameTime;
+
+    if (victory) {
+        playerStats.gamesWon++;
+        playerStats.currentStreak++;
+        if (playerStats.currentStreak > playerStats.bestStreak) {
+            playerStats.bestStreak = playerStats.currentStreak;
+        }
+        if (game.level > playerStats.highestLevel) {
+            playerStats.highestLevel = game.level;
+        }
+        if (currentGameStats.perfectWin) {
+            playerStats.perfectWins++;
+        }
+        if (!playerStats.fastestWin || currentGameStats.gameTime < playerStats.fastestWin) {
+            playerStats.fastestWin = currentGameStats.gameTime;
+        }
+        playSound('victory');
+    } else {
+        playerStats.gamesLost++;
+        playerStats.currentStreak = 0;
+        playSound('defeat');
+    }
+
+    // Save features for next session
+    playerStats.features = { ...game.features };
+    saveStats();
+
+    // Check daily challenges
+    checkDailyChallenges();
+    updateDailyChallengesUI();
+
     const screen = document.getElementById('resultScreen');
     const title = document.getElementById('resultTitle');
     const text = document.getElementById('resultText');
-    
+
     if (victory) {
         screen.className = 'result-screen victory';
         title.textContent = 'VICTORY!';
@@ -2213,7 +3180,7 @@ function endGame(victory) {
         title.textContent = 'DEFEAT';
         text.textContent = 'The enemy has won...';
     }
-    
+
     screen.classList.remove('hidden');
 }
 
@@ -2226,11 +3193,15 @@ function startGame(difficulty) {
     playerHarvested = 0;
     enemyHarvested = 0;
 
+    playSound('click');
+    initAudio();
+
     document.getElementById('menu').classList.add('hidden');
     document.getElementById('resultScreen').classList.add('hidden');
     document.getElementById('pauseMenu').classList.add('hidden');
     document.getElementById('pauseBtn').classList.remove('hidden');
 
+    resetCurrentGameStats();
     generateLevel();
 }
 
@@ -2769,10 +3740,142 @@ document.getElementById('resumeBtn').addEventListener('click', resumeGame);
 document.getElementById('restartBtn').addEventListener('click', restartLevel);
 document.getElementById('quitBtn').addEventListener('click', quitToMenu);
 
+// Sound toggle
+document.getElementById('soundToggle').addEventListener('click', function() {
+    playerStats.settings.soundEnabled = !playerStats.settings.soundEnabled;
+    this.textContent = playerStats.settings.soundEnabled ? '🔊' : '🔇';
+    this.classList.toggle('muted', !playerStats.settings.soundEnabled);
+    saveStats();
+    if (playerStats.settings.soundEnabled) {
+        initAudio();
+        playSound('click');
+    }
+});
+
+// Stats screen
+document.getElementById('statsBtn').addEventListener('click', showStatsScreen);
+document.getElementById('statsCloseBtn').addEventListener('click', () => {
+    document.getElementById('statsScreen').classList.add('hidden');
+});
+
+function showStatsScreen() {
+    playSound('click');
+    const grid = document.getElementById('statsGrid');
+    const stats = [
+        { value: playerStats.gamesPlayed, label: 'Games Played' },
+        { value: playerStats.gamesWon, label: 'Victories' },
+        { value: playerStats.gamesLost, label: 'Defeats' },
+        { value: playerStats.gamesPlayed > 0 ? Math.round((playerStats.gamesWon / playerStats.gamesPlayed) * 100) + '%' : '0%', label: 'Win Rate' },
+        { value: playerStats.highestLevel, label: 'Highest Level' },
+        { value: playerStats.currentStreak, label: 'Current Streak' },
+        { value: playerStats.bestStreak, label: 'Best Streak' },
+        { value: playerStats.planetsConquered, label: 'Planets Conquered' },
+        { value: playerStats.perfectWins, label: 'Perfect Wins' },
+        { value: playerStats.abilitiesUsed, label: 'Abilities Used' },
+        { value: playerStats.fastestWin ? Math.floor(playerStats.fastestWin) + 's' : '-', label: 'Fastest Win' },
+        { value: Math.floor(playerStats.totalPlayTime / 60) + 'm', label: 'Total Play Time' }
+    ];
+
+    grid.innerHTML = stats.map(s => `
+        <div class="stat-card">
+            <div class="stat-value">${s.value}</div>
+            <div class="stat-label">${s.label}</div>
+        </div>
+    `).join('');
+
+    document.getElementById('statsScreen').classList.remove('hidden');
+}
+
+// Daily challenges UI
+function updateDailyChallengesUI() {
+    const today = getTodayKey();
+    const completed = playerStats.dailyChallenges[today]?.completed || [];
+    const list = document.getElementById('challengesList');
+
+    list.innerHTML = dailyChallenges.map(c => {
+        const isCompleted = completed.includes(c.id);
+        return `
+            <div class="challenge-item ${isCompleted ? 'completed' : ''}">
+                <span class="challenge-icon">${c.title.split(' ')[0]}</span>
+                <div class="challenge-info">
+                    <div class="challenge-title">${c.title.split(' ').slice(1).join(' ')}</div>
+                    <div class="challenge-desc">${c.desc}</div>
+                </div>
+                ${isCompleted ? '<span class="challenge-check">✓</span>' : ''}
+            </div>
+        `;
+    }).join('');
+}
+
+// Multiplayer lobby
+document.getElementById('multiplayerBtn').addEventListener('click', () => {
+    playSound('click');
+    document.getElementById('menu').classList.add('hidden');
+    document.getElementById('multiplayerLobby').classList.remove('hidden');
+    document.getElementById('roomCodeContainer').classList.add('hidden');
+    document.getElementById('joinCodeContainer').classList.remove('hidden');
+    document.getElementById('lobbyTitle').textContent = '🌐 Multiplayer';
+    document.getElementById('lobbyStatus').textContent = 'Host a game or join with a code';
+    document.getElementById('joinCodeInput').value = '';
+});
+
+document.getElementById('lobbyBackBtn').addEventListener('click', () => {
+    playSound('click');
+    document.getElementById('multiplayerLobby').classList.add('hidden');
+    document.getElementById('menu').classList.remove('hidden');
+    endMultiplayerGame();
+});
+
+document.getElementById('lobbyHostBtn').addEventListener('click', () => {
+    playSound('click');
+    document.getElementById('lobbyStatus').textContent = 'Creating room...';
+    hostGame();
+});
+
+document.getElementById('lobbyJoinBtn').addEventListener('click', () => {
+    const code = document.getElementById('joinCodeInput').value.trim().toUpperCase();
+    if (code.length !== 6) {
+        showFloatText(W / 2, H / 2, 'Enter 6-character code', '#f44');
+        return;
+    }
+    playSound('click');
+    document.getElementById('lobbyStatus').textContent = 'Connecting...';
+    joinGame(code);
+});
+
+// Initialize audio on first interaction
+document.addEventListener('click', function initAudioOnce() {
+    initAudio();
+    document.removeEventListener('click', initAudioOnce);
+}, { once: true });
+
+document.addEventListener('touchstart', function initAudioOnce() {
+    initAudio();
+    document.removeEventListener('touchstart', initAudioOnce);
+}, { once: true });
+
+// Load saved settings
+function loadSavedSettings() {
+    // Apply saved feature toggles
+    game.features = { ...playerStats.features };
+    document.querySelectorAll('.feature-toggle').forEach(toggle => {
+        const feature = toggle.dataset.feature;
+        toggle.classList.toggle('active', game.features[feature]);
+    });
+
+    // Apply sound setting
+    const soundBtn = document.getElementById('soundToggle');
+    soundBtn.textContent = playerStats.settings.soundEnabled ? '🔊' : '🔇';
+    soundBtn.classList.toggle('muted', !playerStats.settings.soundEnabled);
+}
+
 // Init
 window.addEventListener('resize', resize);
 resize();
 initBgParticles();
+initDailyChallenges();
+updateDailyChallengesUI();
+loadSavedSettings();
 requestAnimationFrame(animate);
     </script>
 </body>
