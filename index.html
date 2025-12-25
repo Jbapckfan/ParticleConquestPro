@@ -359,8 +359,69 @@
         
         .instructions strong { color: #0ff; }
         .instructions em { color: #f84; font-style: normal; }
-        
+
         .hidden { display: none !important; }
+
+        /* Feature Toggles */
+        .feature-toggles {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .feature-toggle {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            background: #111;
+            border: 1px solid #333;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .feature-toggle:hover {
+            border-color: #555;
+        }
+
+        .feature-toggle.active {
+            border-color: #0ff;
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .feature-toggle .toggle-icon {
+            font-size: 16px;
+        }
+
+        .feature-toggle .toggle-label {
+            color: #888;
+            font-size: 12px;
+        }
+
+        .feature-toggle.active .toggle-label {
+            color: #0ff;
+        }
+
+        .feature-toggle .toggle-check {
+            width: 16px;
+            height: 16px;
+            border: 2px solid #444;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: transparent;
+        }
+
+        .feature-toggle.active .toggle-check {
+            border-color: #0ff;
+            background: #0ff;
+            color: #000;
+        }
         
         /* Result Screen */
         .result-screen {
@@ -515,6 +576,11 @@
             <span class="key-hint">4</span>
             <div class="cooldown-overlay"></div>
         </button>
+        <button class="ability-btn" data-ability="stealth" title="Stealth Attack" id="stealthBtn" style="display:none;">
+            👻
+            <span class="key-hint">5</span>
+            <div class="cooldown-overlay"></div>
+        </button>
     </div>
 
     <div class="send-percent" id="sendPercent">
@@ -562,7 +628,28 @@
                 <button class="diff-btn insane" data-diff="insane">Insane</button>
             </div>
         </div>
-        
+
+        <div class="menu-section">
+            <h3>Special Features</h3>
+            <div class="feature-toggles">
+                <div class="feature-toggle" data-feature="stealth">
+                    <span class="toggle-icon">👻</span>
+                    <span class="toggle-label">Stealth Attack</span>
+                    <span class="toggle-check">✓</span>
+                </div>
+                <div class="feature-toggle" data-feature="comets">
+                    <span class="toggle-icon">☄️</span>
+                    <span class="toggle-label">Comet Showers</span>
+                    <span class="toggle-check">✓</span>
+                </div>
+                <div class="feature-toggle" data-feature="fog">
+                    <span class="toggle-icon">🌫️</span>
+                    <span class="toggle-label">Fog of War</span>
+                    <span class="toggle-check">✓</span>
+                </div>
+            </div>
+        </div>
+
         <div class="instructions">
             <h4>How to Play</h4>
             <div id="classicInstructions">
@@ -581,11 +668,17 @@
             <em>Wormhole</em> — Units sent FROM here appear at partner<br>
             <em>Black Hole</em> — Destroys nearby particles<br><br>
             
-            <h4>Abilities (1-4 keys)</h4>
+            <h4>Abilities (1-5 keys)</h4>
             ⚡ <strong>Boost</strong> — 3x particle speed for 5s<br>
             🛡️ <strong>Shield</strong> — Protect planet for 8s<br>
             💥 <strong>EMP</strong> — Freeze enemy production 6s<br>
-            ☢️ <strong>Nuke</strong> — Destroy 50% units on target
+            ☢️ <strong>Nuke</strong> — Destroy 50% units on target<br>
+            👻 <strong>Stealth</strong> — Hide particles for 3s (toggle on)<br><br>
+
+            <h4>Special Features (toggle above)</h4>
+            👻 <strong>Stealth Attack</strong> — Your particles invisible to AI<br>
+            ☄️ <strong>Comet Showers</strong> — Destroys flying particles<br>
+            🌫️ <strong>Fog of War</strong> — Limited visibility
         </div>
     </div>
 
@@ -613,8 +706,19 @@ const game = {
     activeAbility: null,
     lastClickTime: 0,
     lastClickedPlanet: null,
-    doubleClickThreshold: 300 // ms
+    doubleClickThreshold: 300, // ms
+    // Feature toggles
+    features: {
+        stealth: false,
+        comets: false,
+        fog: false
+    }
 };
+
+// Comet system
+let comets = [];
+let lastCometShower = 0;
+const COMET_SHOWER_INTERVAL = 15000; // 15 seconds between showers
 
 // Harvest mode particles
 let harvestParticles = [];
@@ -625,7 +729,8 @@ const abilities = {
     boost: { cooldown: 0, maxCooldown: 20, duration: 5, active: false, activeTime: 0 },
     shield: { cooldown: 0, maxCooldown: 25, duration: 8, active: false, targetPlanet: null, activeTime: 0 },
     emp: { cooldown: 0, maxCooldown: 30, duration: 6, active: false, activeTime: 0 },
-    nuke: { cooldown: 0, maxCooldown: 35, active: false, activeTime: 0 }
+    nuke: { cooldown: 0, maxCooldown: 35, active: false, activeTime: 0 },
+    stealth: { cooldown: 0, maxCooldown: 25, duration: 3, active: false, activeTime: 0 }
 };
 
 // Difficulty settings
@@ -853,8 +958,10 @@ class Planet {
             p.angle += p.speed * dt;
         }
         
-        this.incomingAttacks = flyingParticles.filter(p => 
-            p.target === this && p.owner !== this.owner
+        // Filter out stealthed player particles from incoming attacks (AI can't see them)
+        this.incomingAttacks = flyingParticles.filter(p =>
+            p.target === this && p.owner !== this.owner &&
+            !(p.owner === PLAYER && p.stealthTime > 0)
         );
         
         // Update selection state based on game.selectedPlanets
@@ -1086,6 +1193,7 @@ class FlyingParticle {
         this.owner = owner;
         this.baseSpeed = 150;
         this.trail = [];
+        this.stealthTime = 0; // Time remaining in stealth
     }
     
     get speed() {
@@ -1095,9 +1203,14 @@ class FlyingParticle {
     }
     
     update(dt) {
+        // Update stealth timer
+        if (this.stealthTime > 0) {
+            this.stealthTime -= dt;
+        }
+
         let targetX = this.target.x;
         let targetY = this.target.y;
-        
+
         // Check for black hole pull
         for (const planet of planets) {
             if (planet.type === 'blackhole') {
@@ -1166,29 +1279,41 @@ class FlyingParticle {
     
     draw() {
         const color = COLORS[this.owner];
-        
+        const isStealthed = this.stealthTime > 0 && this.owner === PLAYER;
+
+        // If stealthed, draw with ghostly effect
+        const stealthAlpha = isStealthed ? 0.3 : 1;
+
         for (let i = 0; i < this.trail.length; i++) {
             const t = this.trail[i];
-            const alpha = (1 - i / this.trail.length) * 0.5;
+            const alpha = (1 - i / this.trail.length) * 0.5 * stealthAlpha;
             ctx.fillStyle = hexToRgba(color.particle, alpha);
             ctx.beginPath();
             ctx.arc(t.x, t.y, 2, 0, Math.PI * 2);
             ctx.fill();
         }
-        
+
         if (this.owner === PLAYER && abilities.boost.active) {
-            ctx.fillStyle = 'rgba(255, 240, 0, 0.5)';
+            ctx.fillStyle = `rgba(255, 240, 0, ${0.5 * stealthAlpha})`;
             ctx.beginPath();
             ctx.arc(this.x, this.y, 10, 0, Math.PI * 2);
             ctx.fill();
         }
-        
-        ctx.fillStyle = color.particle;
+
+        // Stealth glow effect
+        if (isStealthed) {
+            ctx.fillStyle = 'rgba(100, 50, 150, 0.3)';
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, 12, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        ctx.fillStyle = hexToRgba(color.particle, stealthAlpha);
         ctx.beginPath();
         ctx.arc(this.x, this.y, 4, 0, Math.PI * 2);
         ctx.fill();
-        
-        ctx.fillStyle = hexToRgba(color.particle, 0.25);
+
+        ctx.fillStyle = hexToRgba(color.particle, 0.25 * stealthAlpha);
         ctx.beginPath();
         ctx.arc(this.x, this.y, 8, 0, Math.PI * 2);
         ctx.fill();
@@ -1198,7 +1323,7 @@ class FlyingParticle {
 // Background particle
 class BgParticle {
     constructor() { this.reset(); }
-    
+
     reset() {
         this.x = Math.random() * W;
         this.y = Math.random() * H;
@@ -1207,18 +1332,132 @@ class BgParticle {
         this.size = Math.random() * 1.5 + 0.5;
         this.alpha = Math.random() * 0.3 + 0.1;
     }
-    
+
     update(dt) {
         this.x += this.vx * dt;
         this.y += this.vy * dt;
         if (this.x < 0 || this.x > W || this.y < 0 || this.y > H) this.reset();
     }
-    
+
     draw() {
         ctx.fillStyle = `rgba(100, 150, 200, ${this.alpha})`;
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
+    }
+}
+
+// Comet class for comet showers
+class Comet {
+    constructor() {
+        // Random direction: can come from any edge
+        const side = Math.floor(Math.random() * 4);
+        const speed = 400 + Math.random() * 300;
+
+        switch(side) {
+            case 0: // From top
+                this.x = Math.random() * W;
+                this.y = -50;
+                this.vx = (Math.random() - 0.5) * 200;
+                this.vy = speed;
+                break;
+            case 1: // From bottom
+                this.x = Math.random() * W;
+                this.y = H + 50;
+                this.vx = (Math.random() - 0.5) * 200;
+                this.vy = -speed;
+                break;
+            case 2: // From left
+                this.x = -50;
+                this.y = Math.random() * H;
+                this.vx = speed;
+                this.vy = (Math.random() - 0.5) * 200;
+                break;
+            case 3: // From right
+                this.x = W + 50;
+                this.y = Math.random() * H;
+                this.vx = -speed;
+                this.vy = (Math.random() - 0.5) * 200;
+                break;
+        }
+
+        this.size = 8 + Math.random() * 6;
+        this.trail = [];
+        this.hitRadius = 30;
+    }
+
+    update(dt) {
+        // Add trail
+        this.trail.push({ x: this.x, y: this.y, age: 0 });
+        if (this.trail.length > 20) this.trail.shift();
+        for (const t of this.trail) t.age += dt;
+
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+
+        // Check collision with flying particles (not stealthed ones from player perspective)
+        for (let i = flyingParticles.length - 1; i >= 0; i--) {
+            const p = flyingParticles[i];
+            const dx = p.x - this.x;
+            const dy = p.y - this.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < this.hitRadius) {
+                // Destroy the particle
+                effects.push(new Effect('explosion', p.x, p.y, { duration: 0.3 }));
+                flyingParticles.splice(i, 1);
+            }
+        }
+
+        // Return false when off screen
+        return !(this.x < -100 || this.x > W + 100 || this.y < -100 || this.y > H + 100);
+    }
+
+    draw() {
+        // Draw trail
+        for (let i = 0; i < this.trail.length; i++) {
+            const t = this.trail[i];
+            const alpha = (1 - i / this.trail.length) * 0.6;
+            const size = this.size * (1 - i / this.trail.length);
+
+            const gradient = ctx.createRadialGradient(t.x, t.y, 0, t.x, t.y, size);
+            gradient.addColorStop(0, `rgba(255, 200, 100, ${alpha})`);
+            gradient.addColorStop(0.5, `rgba(255, 100, 50, ${alpha * 0.5})`);
+            gradient.addColorStop(1, 'transparent');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(t.x, t.y, size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Draw comet head
+        const headGradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size * 2);
+        headGradient.addColorStop(0, 'rgba(255, 255, 200, 1)');
+        headGradient.addColorStop(0.3, 'rgba(255, 200, 100, 0.8)');
+        headGradient.addColorStop(0.6, 'rgba(255, 100, 50, 0.4)');
+        headGradient.addColorStop(1, 'transparent');
+        ctx.fillStyle = headGradient;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 2, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Bright core
+        ctx.fillStyle = '#fff';
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * 0.4, 0, Math.PI * 2);
+        ctx.fill();
+    }
+}
+
+// Spawn comet shower
+function spawnCometShower() {
+    const numComets = 5 + Math.floor(Math.random() * 8);
+    showFloatText(W / 2, 100, '☄️ COMET SHOWER!', '#ff8844');
+
+    for (let i = 0; i < numComets; i++) {
+        setTimeout(() => {
+            comets.push(new Comet());
+        }, i * 150);
     }
 }
 
@@ -1379,20 +1618,25 @@ function togglePlanetSelection(planet) {
 function generateLevel() {
     const settings = DIFFICULTY[game.difficulty];
     const numPlanets = settings.planets + Math.floor(game.level / 2);
-    
+
     planets = [];
     flyingParticles = [];
     harvestParticles = [];
     effects = [];
     wormholePairs = [];
+    comets = [];
+    lastCometShower = Date.now(); // Reset comet timer
     game.selectedPlanets = [];
     selectedHarvestParticle = null;
-    
+
     for (const key in abilities) {
         abilities[key].cooldown = 0;
         abilities[key].active = false;
         if (abilities[key].targetPlanet) abilities[key].targetPlanet = null;
     }
+
+    // Show/hide stealth button based on feature toggle
+    document.getElementById('stealthBtn').style.display = game.features.stealth ? 'flex' : 'none';
     
     const positions = [];
     const minDist = 130;
@@ -1692,7 +1936,10 @@ function updateAbilities(dt) {
 function activateAbility(abilityName) {
     const ab = abilities[abilityName];
     if (ab.cooldown > 0) return;
-    
+
+    // Stealth requires the feature to be enabled
+    if (abilityName === 'stealth' && !game.features.stealth) return;
+
     switch (abilityName) {
         case 'boost':
             ab.active = true;
@@ -1700,7 +1947,20 @@ function activateAbility(abilityName) {
             ab.cooldown = ab.maxCooldown;
             showFloatText(W / 2, H / 2, '⚡ BOOST ACTIVATED!', '#ff0');
             break;
-            
+
+        case 'stealth':
+            ab.active = true;
+            ab.activeTime = ab.duration;
+            ab.cooldown = ab.maxCooldown;
+            // Apply stealth to all current player flying particles
+            for (const p of flyingParticles) {
+                if (p.owner === PLAYER) {
+                    p.stealthTime = ab.duration;
+                }
+            }
+            showFloatText(W / 2, H / 2, '👻 STEALTH ACTIVATED!', '#a0a');
+            break;
+
         case 'shield':
         case 'nuke':
         case 'emp':
@@ -1870,6 +2130,84 @@ function drawAttackPreviewLines(targetX, targetY) {
     }
 }
 
+// Fog of War drawing
+function drawFogOfWar() {
+    if (!game.features.fog) return;
+
+    // Create fog canvas overlay
+    ctx.save();
+
+    // Draw full fog first
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.85)';
+    ctx.fillRect(0, 0, W, H);
+
+    // Use destination-out to cut holes for player visibility
+    ctx.globalCompositeOperation = 'destination-out';
+
+    // Cut visibility around player planets
+    for (const planet of planets) {
+        if (planet.owner === PLAYER) {
+            const visRadius = planet.size * 5; // Visibility radius based on planet size
+            const gradient = ctx.createRadialGradient(
+                planet.x, planet.y, planet.size,
+                planet.x, planet.y, visRadius
+            );
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+            gradient.addColorStop(0.7, 'rgba(0, 0, 0, 0.8)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(planet.x, planet.y, visRadius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    // Also reveal around player's flying particles
+    for (const p of flyingParticles) {
+        if (p.owner === PLAYER) {
+            const visRadius = 60;
+            const gradient = ctx.createRadialGradient(
+                p.x, p.y, 5,
+                p.x, p.y, visRadius
+            );
+            gradient.addColorStop(0, 'rgba(0, 0, 0, 1)');
+            gradient.addColorStop(0.6, 'rgba(0, 0, 0, 0.5)');
+            gradient.addColorStop(1, 'rgba(0, 0, 0, 0)');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, visRadius, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+
+    ctx.restore();
+}
+
+// Check if a point is visible to the player (for fog of war)
+function isVisibleToPlayer(x, y) {
+    if (!game.features.fog) return true;
+
+    for (const planet of planets) {
+        if (planet.owner === PLAYER) {
+            const dx = x - planet.x;
+            const dy = y - planet.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < planet.size * 5) return true;
+        }
+    }
+
+    for (const p of flyingParticles) {
+        if (p.owner === PLAYER) {
+            const dx = x - p.x;
+            const dy = y - p.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 60) return true;
+        }
+    }
+
+    return false;
+}
+
 // Game loop
 let lastTime = 0;
 let currentTouch = null;
@@ -1913,22 +2251,40 @@ function animate(time) {
         for (const planet of planets) planet.update(dt);
         flyingParticles = flyingParticles.filter(p => p.update(dt));
         effects = effects.filter(e => e.update(dt));
-        
+
+        // Update comets
+        if (game.features.comets) {
+            comets = comets.filter(c => c.update(dt));
+
+            // Spawn comet showers periodically
+            const now = Date.now();
+            if (now - lastCometShower > COMET_SHOWER_INTERVAL) {
+                lastCometShower = now;
+                spawnCometShower();
+            }
+        }
+
         updateAI(dt);
         updateAbilities(realDt);
         checkWinCondition();
         updateStats();
-    
+
         drawWormholeConnections();
-        
+
         for (const planet of planets) planet.draw();
         for (const e of effects) e.draw();
         for (const p of flyingParticles) p.draw();
-        
+
+        // Draw comets
+        for (const c of comets) c.draw();
+
         // Attack preview lines when planets are selected and mouse is moving
         if (game.selectedPlanets.length > 0 && currentTouch) {
             drawAttackPreviewLines(currentTouch.x, currentTouch.y);
         }
+
+        // Draw fog of war on top
+        drawFogOfWar();
     }
     
     if (game.state === 'menu' || game.state === 'ended') {
@@ -2043,11 +2399,12 @@ canvas.addEventListener('touchmove', e => { e.preventDefault(); handleMove(e.tou
 // Keyboard shortcuts
 document.addEventListener('keydown', e => {
     if (game.state !== 'playing') return;
-    
+
     if (e.key === '1') activateAbility('boost');
     if (e.key === '2') activateAbility('shield');
     if (e.key === '3') activateAbility('emp');
     if (e.key === '4') activateAbility('nuke');
+    if (e.key === '5') activateAbility('stealth');
     if (e.key === 'a' || e.key === 'A') selectAllPlayerPlanets(); // 'A' for select All
     if (e.key === 'Escape') {
         game.activeAbility = null;
@@ -2099,6 +2456,15 @@ document.querySelectorAll('.speed-btn').forEach(btn => {
 document.querySelectorAll('.ability-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         activateAbility(this.dataset.ability);
+    });
+});
+
+// Feature toggles
+document.querySelectorAll('.feature-toggle').forEach(toggle => {
+    toggle.addEventListener('click', function() {
+        const feature = this.dataset.feature;
+        game.features[feature] = !game.features[feature];
+        this.classList.toggle('active', game.features[feature]);
     });
 });
 
