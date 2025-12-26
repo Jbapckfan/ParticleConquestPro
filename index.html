@@ -2313,6 +2313,11 @@ function handleClientData(data) {
             applyGameTick(data);
             break;
 
+        case 'attack':
+            // Attack broadcast from host - spawn particles so all players see attacks
+            spawnAttackParticles(data.sourceIdx, data.targetIdx, data.units, data.team);
+            break;
+
         case 'ping':
             hostConnection.send({ type: 'pong', t: data.t });
             break;
@@ -2556,9 +2561,8 @@ function startClientGame(data) {
     comets = [];
 
     for (const pd of data.planets) {
-        const planet = new Planet(pd.x, pd.y, pd.size, pd.type);
-        planet.owner = pd.owner;
-        planet.units = pd.units;
+        // Correctly pass all Planet constructor params: x, y, size, owner, units, type
+        const planet = new Planet(pd.x, pd.y, pd.size, pd.owner, pd.units, pd.type);
         planets.push(planet);
     }
 
@@ -2632,6 +2636,39 @@ function applyGameTick(data) {
     });
 }
 
+// Broadcast attack to all clients so they can see particles
+function broadcastAttack(sourceIdx, targetIdx, units, team) {
+    broadcast({
+        type: 'attack',
+        sourceIdx,
+        targetIdx,
+        units,
+        team
+    });
+    // Also execute locally on host
+    spawnAttackParticles(sourceIdx, targetIdx, units, team);
+}
+
+// Spawn attack particles (used by both host and clients)
+function spawnAttackParticles(sourceIdx, targetIdx, units, team) {
+    const source = planets[sourceIdx];
+    const target = planets[targetIdx];
+    if (!source || !target) return;
+
+    for (let i = 0; i < units; i++) {
+        setTimeout(() => {
+            const angle = Math.random() * Math.PI * 2;
+            const dist = source.size + 5;
+            flyingParticles.push(new FlyingParticle(
+                source.x + Math.cos(angle) * dist,
+                source.y + Math.sin(angle) * dist,
+                target,
+                team
+            ));
+        }, i * 25);
+    }
+}
+
 function executePlayerCommand(peerId, data) {
     // Host executes player commands authoritatively
     const player = lobby.players.find(p => p.id === peerId);
@@ -2654,18 +2691,8 @@ function executePlayerCommand(peerId, data) {
 
             source.units -= units;
 
-            for (let i = 0; i < units; i++) {
-                setTimeout(() => {
-                    const angle = Math.random() * Math.PI * 2;
-                    const dist = source.size + 5;
-                    flyingParticles.push(new FlyingParticle(
-                        source.x + Math.cos(angle) * dist,
-                        source.y + Math.sin(angle) * dist,
-                        target,
-                        playerTeam
-                    ));
-                }, i * 25);
-            }
+            // Broadcast to all clients so everyone sees the attack
+            broadcastAttack(data.sourceIdx, data.targetIdx, units, playerTeam);
             break;
     }
 }
@@ -2719,18 +2746,10 @@ function runMultiplayerAI() {
             const units = Math.floor(source.units * (percent / 100));
             source.units -= units;
 
-            for (let i = 0; i < units; i++) {
-                setTimeout(() => {
-                    const angle = Math.random() * Math.PI * 2;
-                    const dist = source.size + 5;
-                    flyingParticles.push(new FlyingParticle(
-                        source.x + Math.cos(angle) * dist,
-                        source.y + Math.sin(angle) * dist,
-                        bestTarget,
-                        team
-                    ));
-                }, i * 25);
-            }
+            // Use broadcastAttack so all clients see AI attacks
+            const sourceIdx = planets.indexOf(source);
+            const targetIdx = planets.indexOf(bestTarget);
+            broadcastAttack(sourceIdx, targetIdx, units, team);
         }
     }
 }
@@ -2809,9 +2828,10 @@ function generateMultiplayerLevel(seed) {
 
         positions.push({ x, y });
         const size = 22 + random() * 18;
-        const planet = new Planet(x, y, size, 'normal');
-        planet.owner = -1; // Neutral by default (using -1 for neutral in MP)
-        planet.units = 8 + Math.floor(random() * 20);
+        const units = 8 + Math.floor(random() * 20);
+        // Constructor: x, y, size, owner, units, type
+        // -1 = neutral in multiplayer
+        const planet = new Planet(x, y, size, -1, units, 'normal');
         planets.push(planet);
     }
 
@@ -3854,27 +3874,51 @@ class Planet {
             ctx.fill();
         }
         
-        // Unit count
+        // Unit count - HIDE if planet is in fog and not ours
+        // Use try-catch to ensure rendering continues even if visibility check fails
+        let planetVisible = true;
+        let isMine = false;
+        try {
+            isMine = isMyPlanet(this);
+            planetVisible = isMine || isVisibleToPlayer(this.x, this.y);
+        } catch (e) {
+            // Fallback: show everything if visibility check fails
+            planetVisible = true;
+            console.warn('Visibility check error:', e);
+        }
+
         ctx.fillStyle = '#fff';
         ctx.font = `bold ${Math.max(14, this.size / 3)}px system-ui`;
         ctx.textAlign = 'center';
         ctx.textBaseline = 'middle';
-        ctx.fillText(Math.floor(this.units), this.x, this.y);
-        
-        // Production rate indicator (small text showing rate)
-        if (this.owner !== NEUTRAL && this.type !== 'blackhole') {
-            const rate = this.productionRate.toFixed(1);
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-            ctx.font = '10px system-ui';
-            ctx.fillText(`+${rate}/s`, this.x, this.y + this.size * 0.4);
+
+        if (planetVisible) {
+            // Show real unit count
+            ctx.fillText(Math.floor(this.units), this.x, this.y);
+
+            // Production rate indicator (small text showing rate)
+            if (this.owner !== NEUTRAL && this.type !== 'blackhole') {
+                const rate = this.productionRate.toFixed(1);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.font = '10px system-ui';
+                ctx.fillText(`+${rate}/s`, this.x, this.y + this.size * 0.4);
+            }
+        } else {
+            // Planet in fog - show "?" for unit count (still visible but info hidden)
+            ctx.fillStyle = 'rgba(150, 150, 150, 0.7)';
+            ctx.fillText('?', this.x, this.y);
         }
-        
-        // Ownership label
-        const teamLabel = getTeamLabel(this.owner);
-        if (teamLabel) {
-            ctx.fillStyle = getOwnerColor(this.owner).main;
-            ctx.font = 'bold 10px system-ui';
-            ctx.fillText(teamLabel, this.x, this.y + this.size + 18);
+
+        // Ownership label - only show if visible
+        try {
+            const teamLabel = getTeamLabel(this.owner);
+            if (teamLabel && planetVisible) {
+                ctx.fillStyle = getOwnerColor(this.owner).main;
+                ctx.font = 'bold 10px system-ui';
+                ctx.fillText(teamLabel, this.x, this.y + this.size + 18);
+            }
+        } catch (e) {
+            // Ignore team label errors
         }
     }
     
@@ -4018,10 +4062,25 @@ class FlyingParticle {
     
     draw() {
         const color = getOwnerColor(this.owner);
-        const isMyTeam = multiplayerActive
-            ? lobby.players.find(p => p.id === myPlayerId)?.team === this.owner
-            : this.owner === PLAYER;
+        let isMyTeam = false;
+        try {
+            isMyTeam = multiplayerActive
+                ? lobby.players.find(p => p.id === myPlayerId)?.team === this.owner
+                : this.owner === PLAYER;
+        } catch (e) {
+            isMyTeam = this.owner === PLAYER; // Fallback to single player check
+        }
         const isStealthed = this.stealthTime > 0 && isMyTeam;
+
+        // FOG OF WAR: Don't draw enemy particles that are in fog
+        try {
+            if (!isMyTeam && game.features.fog && !isVisibleToPlayer(this.x, this.y)) {
+                return; // Skip drawing - particle is hidden in fog
+            }
+        } catch (e) {
+            // If visibility check fails, draw the particle anyway
+            console.warn('Particle visibility check error:', e);
+        }
 
         // If stealthed, draw with ghostly effect
         const stealthAlpha = isStealthed ? 0.3 : 1;
@@ -5059,9 +5118,9 @@ function drawFogOfWar() {
         initFogCanvas();
     }
 
-    // Clear fog canvas and fill with dark fog
+    // Clear fog canvas and fill with dark fog (0.7 opacity allows some visibility of enemy positions)
     fogCtx.clearRect(0, 0, W, H);
-    fogCtx.fillStyle = 'rgba(0, 0, 0, 0.9)';
+    fogCtx.fillStyle = 'rgba(0, 0, 0, 0.7)';
     fogCtx.fillRect(0, 0, W, H);
 
     // Use destination-out on the FOG canvas to cut visibility holes
@@ -5115,21 +5174,23 @@ function drawFogOfWar() {
 function isVisibleToPlayer(x, y) {
     if (!game.features.fog) return true;
 
+    const myTeam = getMyTeam();
+
     for (const planet of planets) {
-        if (planet.owner === PLAYER) {
+        if (isMyPlanet(planet)) {
             const dx = x - planet.x;
             const dy = y - planet.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < planet.size * 5) return true;
+            if (dist < planet.size * 6) return true;
         }
     }
 
     for (const p of flyingParticles) {
-        if (p.owner === PLAYER) {
+        if (p.owner === myTeam) {
             const dx = x - p.x;
             const dy = y - p.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 60) return true;
+            if (dist < 80) return true;
         }
     }
 
