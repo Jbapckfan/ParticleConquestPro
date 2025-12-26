@@ -279,8 +279,8 @@
         .diff-btn.medium:hover { background: #aa42; }
         .diff-btn.hard { border-color: #a44; }
         .diff-btn.hard:hover { background: #a442; }
-        .diff-btn.insane { border-color: #a4a; }
-        .diff-btn.insane:hover { background: #a4a2; }
+        .diff-btn.brutal { border-color: #a0f; }
+        .diff-btn.brutal:hover { background: #a0f2; }
         
         .mode-btn {
             padding: 12px 25px;
@@ -887,6 +887,306 @@
             z-index: 50;
         }
 
+        /* ============================================
+           JUICE EFFECTS - Screen transitions, polish
+           ============================================ */
+
+        /* Screen transitions */
+        .menu, .result-screen, .stats-screen, .multiplayer-lobby, .pause-menu {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+
+        .menu.hidden, .result-screen.hidden, .stats-screen.hidden,
+        .multiplayer-lobby.hidden, .pause-menu.hidden {
+            opacity: 0;
+            transform: scale(0.95);
+            pointer-events: none;
+        }
+
+        /* Button juice */
+        .menu-btn, .percent-btn, .speed-btn, .ability-btn {
+            transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+        }
+
+        .menu-btn:active, .percent-btn:active {
+            transform: scale(0.95) !important;
+        }
+
+        /* Achievement toast */
+        .achievement-toast {
+            position: fixed;
+            top: max(20px, env(safe-area-inset-top));
+            left: 50%;
+            transform: translateX(-50%) translateY(-120px);
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #ffd700;
+            border-radius: 16px;
+            padding: 16px 24px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            z-index: 10000;
+            box-shadow: 0 10px 40px rgba(255, 215, 0, 0.4), 0 0 60px rgba(255, 215, 0, 0.2);
+            opacity: 0;
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.3s ease;
+        }
+
+        .achievement-toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        .achievement-toast .ach-icon {
+            font-size: 40px;
+            animation: achPop 0.5s ease 0.3s both;
+        }
+
+        .achievement-toast .ach-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .achievement-toast .ach-label {
+            font-size: 11px;
+            color: #ffd700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .achievement-toast .ach-name {
+            font-size: 18px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        @keyframes achPop {
+            0% { transform: scale(0) rotate(-20deg); }
+            60% { transform: scale(1.3) rotate(10deg); }
+            100% { transform: scale(1) rotate(0deg); }
+        }
+
+        /* Tutorial overlay */
+        .tutorial-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            animation: fadeIn 0.5s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        .tutorial-spotlight {
+            position: absolute;
+            border-radius: 50%;
+            box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.85);
+            transition: all 0.5s ease;
+            pointer-events: none;
+        }
+
+        .tutorial-box {
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%);
+            border: 2px solid #0ff;
+            border-radius: 20px;
+            padding: 32px 40px;
+            text-align: center;
+            max-width: 380px;
+            animation: tutorialPop 0.5s ease;
+            box-shadow: 0 20px 60px rgba(0, 255, 255, 0.3);
+        }
+
+        @keyframes tutorialPop {
+            0% { opacity: 0; transform: scale(0.8) translateY(20px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        .tutorial-box h2 {
+            font-size: 24px;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+
+        .tutorial-box p {
+            font-size: 15px;
+            color: #aaa;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+
+        .tutorial-box .step-indicator {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .tutorial-box .step-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #333;
+            transition: background 0.3s ease;
+        }
+
+        .tutorial-box .step-dot.active {
+            background: #0ff;
+        }
+
+        .tutorial-box .step-dot.done {
+            background: #0a8;
+        }
+
+        .tutorial-btns {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .tutorial-btn {
+            padding: 12px 28px;
+            border-radius: 25px;
+            border: none;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .tutorial-btn.primary {
+            background: linear-gradient(135deg, #0ff, #0af);
+            color: #000;
+        }
+
+        .tutorial-btn.secondary {
+            background: transparent;
+            border: 1px solid #444;
+            color: #888;
+        }
+
+        .tutorial-btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .tutorial-btn.primary:hover {
+            box-shadow: 0 5px 20px rgba(0, 255, 255, 0.4);
+        }
+
+        /* Difficulty selector */
+        .difficulty-selector {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .diff-btn {
+            padding: 10px 20px;
+            border-radius: 20px;
+            border: 2px solid #333;
+            background: rgba(30, 30, 30, 0.9);
+            color: #888;
+            font-size: 13px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .diff-btn:hover {
+            border-color: #555;
+            color: #fff;
+        }
+
+        .diff-btn.selected {
+            border-color: #0ff;
+            color: #0ff;
+            background: rgba(0, 255, 255, 0.1);
+        }
+
+        .diff-btn.easy { --diff-color: #4a4; }
+        .diff-btn.medium { --diff-color: #fa0; }
+        .diff-btn.hard { --diff-color: #f44; }
+        .diff-btn.brutal { --diff-color: #a0f; }
+
+        .diff-btn.selected.easy { border-color: #4a4; color: #4a4; background: rgba(68, 170, 68, 0.1); }
+        .diff-btn.selected.medium { border-color: #fa0; color: #fa0; background: rgba(255, 170, 0, 0.1); }
+        .diff-btn.selected.hard { border-color: #f44; color: #f44; background: rgba(255, 68, 68, 0.1); }
+        .diff-btn.selected.brutal { border-color: #a0f; color: #a0f; background: rgba(170, 0, 255, 0.1); }
+
+        /* Achievement gallery */
+        .achievement-gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 12px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 15px;
+            padding: 5px;
+        }
+
+        .ach-card {
+            background: rgba(30, 30, 30, 0.9);
+            border: 2px solid #333;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            transition: all 0.2s ease;
+        }
+
+        .ach-card.unlocked {
+            border-color: #ffd700;
+            background: rgba(255, 215, 0, 0.1);
+        }
+
+        .ach-card.locked {
+            opacity: 0.5;
+            filter: grayscale(1);
+        }
+
+        .ach-card .ach-icon {
+            font-size: 32px;
+            margin-bottom: 8px;
+        }
+
+        .ach-card .ach-name {
+            font-size: 12px;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 4px;
+        }
+
+        .ach-card .ach-desc {
+            font-size: 10px;
+            color: #888;
+        }
+
+        /* Pulse animation for abilities ready */
+        @keyframes abilityReady {
+            0%, 100% { box-shadow: 0 0 10px rgba(0, 255, 255, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(0, 255, 255, 0.6); }
+        }
+
+        .ability-btn:not(.cooldown) {
+            animation: abilityReady 2s ease infinite;
+        }
+
+        /* Victory/defeat screen animations */
+        .result-screen .result-title {
+            animation: resultPop 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes resultPop {
+            0% { transform: scale(0); opacity: 0; }
+            60% { transform: scale(1.1); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
         /* Selection count indicator */
         .selection-indicator {
             position: fixed;
@@ -1084,10 +1384,10 @@
         <div class="menu-section">
             <h3>Select Difficulty</h3>
             <div class="difficulty-btns">
-                <button class="diff-btn easy" data-diff="easy">Easy</button>
-                <button class="diff-btn medium" data-diff="medium">Medium</button>
-                <button class="diff-btn hard" data-diff="hard">Hard</button>
-                <button class="diff-btn insane" data-diff="insane">Insane</button>
+                <button class="diff-btn easy" data-diff="easy">🟢 Easy</button>
+                <button class="diff-btn medium" data-diff="medium">🟡 Medium</button>
+                <button class="diff-btn hard" data-diff="hard">🔴 Hard</button>
+                <button class="diff-btn brutal" data-diff="brutal">💀 Brutal</button>
             </div>
         </div>
 
@@ -1188,6 +1488,8 @@ const defaultStats = {
     bestStreak: 0,
     dailyChallenges: {},
     lastDailyDate: null,
+    tutorialComplete: false,
+    achievements: [],
     settings: {
         soundEnabled: true,
         musicEnabled: true,
@@ -1373,6 +1675,29 @@ function playSound(type, options = {}) {
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
                 osc.start(now);
                 osc.stop(now + 0.05);
+                break;
+            }
+            case 'achievement': {
+                // Triumphant achievement fanfare
+                const notes = [
+                    { freq: 783.99, delay: 0 },      // G5
+                    { freq: 987.77, delay: 0.1 },    // B5
+                    { freq: 1174.66, delay: 0.2 },   // D6
+                    { freq: 1567.98, delay: 0.35 },  // G6
+                ];
+                notes.forEach(note => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.type = 'triangle';
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.setValueAtTime(note.freq, now + note.delay);
+                    gain.gain.setValueAtTime(0, now + note.delay);
+                    gain.gain.linearRampToValueAtTime(vol * 0.25, now + note.delay + 0.02);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + note.delay + 0.5);
+                    osc.start(now + note.delay);
+                    osc.stop(now + note.delay + 0.5);
+                });
                 break;
             }
         }
@@ -1768,6 +2093,461 @@ const game = {
     }
 };
 
+// ============================================
+// JUICE SYSTEM - Screen shake, particles, flash, slowmo
+// ============================================
+const juice = {
+    // Screen shake
+    shakeIntensity: 0,
+    shakeDuration: 0,
+    shakeDecay: 0,
+
+    // Slow motion
+    slowMotionScale: 1,
+    slowMotionDuration: 0,
+
+    // Screen flash
+    flashColor: null,
+    flashAlpha: 0,
+
+    // Juice particles (separate from game particles)
+    particles: [],
+
+    shake(intensity = 10, duration = 200) {
+        this.shakeIntensity = Math.max(this.shakeIntensity, intensity);
+        this.shakeDuration = Math.max(this.shakeDuration, duration);
+        this.shakeDecay = this.shakeIntensity / (duration / 1000);
+        haptics.medium();
+    },
+
+    slowMo(scale = 0.3, duration = 500) {
+        this.slowMotionScale = scale;
+        this.slowMotionDuration = duration;
+    },
+
+    flash(color = '#fff', alpha = 0.4) {
+        this.flashColor = color;
+        this.flashAlpha = alpha;
+    },
+
+    burst(x, y, color, count = 20, speed = 150) {
+        for (let i = 0; i < count; i++) {
+            this.particles.push(new JuiceParticle(x, y, color, speed));
+        }
+    },
+
+    update(dt) {
+        // Update shake
+        if (this.shakeDuration > 0) {
+            this.shakeDuration -= dt * 1000;
+            this.shakeIntensity -= this.shakeDecay * dt;
+            if (this.shakeDuration <= 0 || this.shakeIntensity <= 0) {
+                this.shakeIntensity = 0;
+                this.shakeDuration = 0;
+            }
+        }
+
+        // Update slowmo
+        if (this.slowMotionDuration > 0) {
+            this.slowMotionDuration -= dt * 1000;
+            if (this.slowMotionDuration <= 0) {
+                this.slowMotionScale = 1;
+            }
+        }
+
+        // Update flash
+        if (this.flashAlpha > 0) {
+            this.flashAlpha -= dt * 3;
+            if (this.flashAlpha < 0) this.flashAlpha = 0;
+        }
+
+        // Update particles
+        this.particles = this.particles.filter(p => p.update(dt));
+    },
+
+    getShakeOffset() {
+        if (this.shakeIntensity <= 0) return { x: 0, y: 0 };
+        return {
+            x: (Math.random() - 0.5) * this.shakeIntensity * 2,
+            y: (Math.random() - 0.5) * this.shakeIntensity * 2
+        };
+    },
+
+    getTimeScale() {
+        return this.slowMotionScale;
+    },
+
+    draw(ctx, W, H) {
+        // Draw particles
+        for (const p of this.particles) {
+            p.draw(ctx);
+        }
+
+        // Draw flash
+        if (this.flashAlpha > 0 && this.flashColor) {
+            ctx.save();
+            ctx.globalAlpha = this.flashAlpha;
+            ctx.fillStyle = this.flashColor;
+            ctx.fillRect(0, 0, W, H);
+            ctx.restore();
+        }
+    }
+};
+
+// Juice particle class
+class JuiceParticle {
+    constructor(x, y, color, maxSpeed = 150) {
+        this.x = x;
+        this.y = y;
+        this.color = color;
+        const angle = Math.random() * Math.PI * 2;
+        const speed = 30 + Math.random() * maxSpeed;
+        this.vx = Math.cos(angle) * speed;
+        this.vy = Math.sin(angle) * speed;
+        this.life = 1;
+        this.decay = 1.5 + Math.random() * 1.5;
+        this.size = 2 + Math.random() * 4;
+        this.gravity = 50 + Math.random() * 50;
+    }
+
+    update(dt) {
+        this.x += this.vx * dt;
+        this.y += this.vy * dt;
+        this.vy += this.gravity * dt;
+        this.vx *= 0.98;
+        this.vy *= 0.98;
+        this.life -= this.decay * dt;
+        return this.life > 0;
+    }
+
+    draw(ctx) {
+        ctx.save();
+        ctx.globalAlpha = Math.max(0, this.life);
+        ctx.fillStyle = this.color;
+        ctx.shadowColor = this.color;
+        ctx.shadowBlur = 10;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.size * this.life, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+    }
+}
+
+// ============================================
+// HAPTIC FEEDBACK
+// ============================================
+const haptics = {
+    enabled: true,
+
+    light() {
+        if (!this.enabled || !navigator.vibrate) return;
+        navigator.vibrate(10);
+    },
+
+    medium() {
+        if (!this.enabled || !navigator.vibrate) return;
+        navigator.vibrate(25);
+    },
+
+    heavy() {
+        if (!this.enabled || !navigator.vibrate) return;
+        navigator.vibrate(50);
+    },
+
+    success() {
+        if (!this.enabled || !navigator.vibrate) return;
+        navigator.vibrate([30, 50, 30, 50, 60]);
+    },
+
+    error() {
+        if (!this.enabled || !navigator.vibrate) return;
+        navigator.vibrate([50, 30, 50]);
+    }
+};
+
+// ============================================
+// DIFFICULTY SETTINGS
+// ============================================
+const difficultySettings = {
+    easy: {
+        name: 'Easy',
+        aiReactionTime: 3000,
+        aiAggressiveness: 0.3,
+        aiAbilityChance: 0.2,
+        playerBonus: 15,
+        enemyPenalty: 10,
+        description: 'Relaxed pace'
+    },
+    medium: {
+        name: 'Medium',
+        aiReactionTime: 1500,
+        aiAggressiveness: 0.5,
+        aiAbilityChance: 0.5,
+        playerBonus: 0,
+        enemyPenalty: 0,
+        description: 'Balanced'
+    },
+    hard: {
+        name: 'Hard',
+        aiReactionTime: 800,
+        aiAggressiveness: 0.7,
+        aiAbilityChance: 0.8,
+        playerBonus: -10,
+        enemyPenalty: -10,
+        description: 'Challenging'
+    },
+    brutal: {
+        name: 'Brutal',
+        aiReactionTime: 400,
+        aiAggressiveness: 0.9,
+        aiAbilityChance: 1.0,
+        playerBonus: -20,
+        enemyPenalty: -20,
+        description: 'Merciless'
+    }
+};
+
+// ============================================
+// ACHIEVEMENT SYSTEM
+// ============================================
+const achievements = {
+    definitions: [
+        // Beginner
+        { id: 'first_blood', name: 'First Blood', desc: 'Capture your first planet', icon: '🩸', check: s => s.planetsConquered >= 1 },
+        { id: 'first_win', name: 'Victor', desc: 'Win your first game', icon: '🏆', check: s => s.gamesWon >= 1 },
+
+        // Streaks
+        { id: 'streak_3', name: 'On Fire', desc: 'Win 3 games in a row', icon: '🔥', check: s => s.bestStreak >= 3 },
+        { id: 'streak_5', name: 'Unstoppable', desc: 'Win 5 games in a row', icon: '⚡', check: s => s.bestStreak >= 5 },
+        { id: 'streak_10', name: 'Legendary', desc: 'Win 10 in a row', icon: '👑', check: s => s.bestStreak >= 10 },
+
+        // Speed
+        { id: 'speed_2min', name: 'Quick Draw', desc: 'Win in under 2 minutes', icon: '⏱️', check: s => s.fastestWin && s.fastestWin < 120 },
+        { id: 'speed_1min', name: 'Blitz', desc: 'Win in under 1 minute', icon: '💨', check: s => s.fastestWin && s.fastestWin < 60 },
+        { id: 'speed_30s', name: 'Speed Demon', desc: 'Win in under 30 seconds', icon: '🚀', check: s => s.fastestWin && s.fastestWin < 30 },
+
+        // Perfection
+        { id: 'perfect_1', name: 'Flawless', desc: 'Win without losing a planet', icon: '💎', check: s => s.perfectWins >= 1 },
+        { id: 'perfect_5', name: 'Immaculate', desc: '5 perfect wins', icon: '✨', check: s => s.perfectWins >= 5 },
+        { id: 'perfect_10', name: 'Untouchable', desc: '10 perfect wins', icon: '🌟', check: s => s.perfectWins >= 10 },
+
+        // Volume
+        { id: 'conquer_50', name: 'Warlord', desc: 'Capture 50 planets', icon: '⚔️', check: s => s.planetsConquered >= 50 },
+        { id: 'conquer_100', name: 'Conqueror', desc: 'Capture 100 planets', icon: '🌍', check: s => s.planetsConquered >= 100 },
+        { id: 'conquer_500', name: 'Emperor', desc: 'Capture 500 planets', icon: '👸', check: s => s.planetsConquered >= 500 },
+        { id: 'games_25', name: 'Regular', desc: 'Play 25 games', icon: '🎯', check: s => s.gamesPlayed >= 25 },
+        { id: 'games_50', name: 'Veteran', desc: 'Play 50 games', icon: '🎖️', check: s => s.gamesPlayed >= 50 },
+        { id: 'games_100', name: 'Addicted', desc: 'Play 100 games', icon: '🎮', check: s => s.gamesPlayed >= 100 },
+
+        // Abilities
+        { id: 'ability_50', name: 'Gifted', desc: 'Use 50 abilities', icon: '🔮', check: s => s.abilitiesUsed >= 50 },
+        { id: 'ability_100', name: 'Master', desc: 'Use 100 abilities', icon: '🧙', check: s => s.abilitiesUsed >= 100 },
+
+        // Time
+        { id: 'time_30m', name: 'Getting Started', desc: 'Play for 30 minutes', icon: '⏰', check: s => s.totalPlayTime >= 1800 },
+        { id: 'time_1h', name: 'Dedicated', desc: 'Play for 1 hour', icon: '📅', check: s => s.totalPlayTime >= 3600 },
+        { id: 'time_5h', name: 'Committed', desc: 'Play for 5 hours', icon: '💪', check: s => s.totalPlayTime >= 18000 },
+
+        // Daily
+        { id: 'daily_1', name: 'Daily Player', desc: 'Complete a daily challenge', icon: '📆', check: s => countCompletedDailies(s) >= 1 },
+        { id: 'daily_10', name: 'Consistent', desc: 'Complete 10 daily challenges', icon: '🗓️', check: s => countCompletedDailies(s) >= 10 },
+
+        // Levels
+        { id: 'level_5', name: 'Rising Star', desc: 'Reach level 5', icon: '⭐', check: s => s.highestLevel >= 5 },
+        { id: 'level_10', name: 'Champion', desc: 'Reach level 10', icon: '🏅', check: s => s.highestLevel >= 10 },
+        { id: 'level_20', name: 'Legend', desc: 'Reach level 20', icon: '🌠', check: s => s.highestLevel >= 20 },
+    ],
+
+    unlocked: new Set(),
+    toastQueue: [],
+
+    load() {
+        this.unlocked = new Set(playerStats.achievements || []);
+    },
+
+    check() {
+        for (const ach of this.definitions) {
+            if (this.unlocked.has(ach.id)) continue;
+            if (ach.check && ach.check(playerStats)) {
+                this.unlock(ach.id);
+            }
+        }
+    },
+
+    unlock(id) {
+        if (this.unlocked.has(id)) return;
+
+        const ach = this.definitions.find(a => a.id === id);
+        if (!ach) return;
+
+        this.unlocked.add(id);
+        playerStats.achievements = Array.from(this.unlocked);
+        saveStats();
+
+        this.showToast(ach);
+        playSound('achievement');
+        haptics.success();
+    },
+
+    showToast(ach) {
+        const toast = document.createElement('div');
+        toast.className = 'achievement-toast';
+        toast.innerHTML = `
+            <div class="ach-icon">${ach.icon}</div>
+            <div class="ach-info">
+                <div class="ach-label">Achievement Unlocked!</div>
+                <div class="ach-name">${ach.name}</div>
+            </div>
+        `;
+        document.body.appendChild(toast);
+
+        requestAnimationFrame(() => {
+            toast.classList.add('show');
+        });
+
+        setTimeout(() => {
+            toast.classList.remove('show');
+            setTimeout(() => toast.remove(), 600);
+        }, 3500);
+    }
+};
+
+function countCompletedDailies(stats) {
+    let count = 0;
+    for (const date in stats.dailyChallenges) {
+        count += (stats.dailyChallenges[date].completed || []).length;
+    }
+    return count;
+}
+
+// ============================================
+// TUTORIAL SYSTEM
+// ============================================
+const tutorial = {
+    steps: [
+        {
+            title: "Welcome to Particle Conquest!",
+            text: "Conquer all planets to win. Let's learn the basics.",
+            waitFor: null
+        },
+        {
+            title: "Your Planets",
+            text: "The cyan planets are yours. They generate particles over time.",
+            waitFor: null
+        },
+        {
+            title: "Select a Planet",
+            text: "Tap one of your planets to select it.",
+            waitFor: 'select'
+        },
+        {
+            title: "Attack!",
+            text: "Now tap an enemy (red) or neutral (gray) planet to send your particles!",
+            waitFor: 'attack'
+        },
+        {
+            title: "Abilities",
+            text: "Use special abilities at the bottom for powerful effects. They recharge over time.",
+            waitFor: null
+        },
+        {
+            title: "You're Ready!",
+            text: "Conquer all enemy planets to win. Good luck, commander!",
+            waitFor: null
+        }
+    ],
+
+    currentStep: 0,
+    active: false,
+    overlay: null,
+
+    shouldShow() {
+        return !playerStats.tutorialComplete && playerStats.gamesPlayed === 0;
+    },
+
+    start() {
+        if (!this.shouldShow()) return;
+        this.active = true;
+        this.currentStep = 0;
+        this.createOverlay();
+        this.showStep();
+    },
+
+    createOverlay() {
+        this.overlay = document.createElement('div');
+        this.overlay.className = 'tutorial-overlay';
+        this.updateOverlayContent();
+        document.body.appendChild(this.overlay);
+    },
+
+    updateOverlayContent() {
+        const step = this.steps[this.currentStep];
+        const totalSteps = this.steps.length;
+
+        this.overlay.innerHTML = `
+            <div class="tutorial-box">
+                <div class="step-indicator">
+                    ${this.steps.map((_, i) => `
+                        <div class="step-dot ${i < this.currentStep ? 'done' : ''} ${i === this.currentStep ? 'active' : ''}"></div>
+                    `).join('')}
+                </div>
+                <h2>${step.title}</h2>
+                <p>${step.text}</p>
+                <div class="tutorial-btns">
+                    ${step.waitFor ? '' : `<button class="tutorial-btn primary" id="tutorialNext">${this.currentStep === totalSteps - 1 ? "Let's Play!" : 'Next'}</button>`}
+                    ${this.currentStep === 0 ? `<button class="tutorial-btn secondary" id="tutorialSkip">Skip Tutorial</button>` : ''}
+                </div>
+                ${step.waitFor ? `<p style="color: #0ff; font-size: 12px; margin-top: 15px;">👆 ${step.waitFor === 'select' ? 'Tap your planet' : 'Tap an enemy planet'}</p>` : ''}
+            </div>
+        `;
+
+        const nextBtn = this.overlay.querySelector('#tutorialNext');
+        const skipBtn = this.overlay.querySelector('#tutorialSkip');
+
+        if (nextBtn) {
+            nextBtn.onclick = () => this.nextStep();
+        }
+        if (skipBtn) {
+            skipBtn.onclick = () => this.end();
+        }
+    },
+
+    showStep() {
+        this.updateOverlayContent();
+    },
+
+    nextStep() {
+        playSound('click');
+        this.currentStep++;
+        if (this.currentStep >= this.steps.length) {
+            this.end();
+        } else {
+            this.showStep();
+        }
+    },
+
+    onEvent(eventType) {
+        if (!this.active) return;
+        const step = this.steps[this.currentStep];
+        if (step.waitFor === eventType) {
+            this.nextStep();
+        }
+    },
+
+    end() {
+        this.active = false;
+        playerStats.tutorialComplete = true;
+        saveStats();
+        if (this.overlay) {
+            this.overlay.style.animation = 'fadeIn 0.3s ease reverse forwards';
+            setTimeout(() => {
+                this.overlay.remove();
+                this.overlay = null;
+            }, 300);
+        }
+    }
+};
+
 // Comet system
 let comets = [];
 let lastCometShower = 0;
@@ -1791,7 +2571,7 @@ const DIFFICULTY = {
     easy: { aiSpeed: 0.4, aiAggression: 0.25, planets: 6, startingUnits: 35, specialPlanets: 1 },
     medium: { aiSpeed: 0.7, aiAggression: 0.45, planets: 8, startingUnits: 40, specialPlanets: 2 },
     hard: { aiSpeed: 1.0, aiAggression: 0.65, planets: 10, startingUnits: 50, specialPlanets: 3 },
-    insane: { aiSpeed: 1.3, aiAggression: 0.85, planets: 12, startingUnits: 60, specialPlanets: 4 }
+    brutal: { aiSpeed: 1.4, aiAggression: 0.9, planets: 12, startingUnits: 65, specialPlanets: 4 }
 };
 
 // Planet types
@@ -2309,16 +3089,27 @@ class FlyingParticle {
                     if (this.owner === PLAYER) {
                         playerStats.planetsConquered++;
                         playSound('capture');
+                        // Capture juice!
+                        juice.shake(12, 200);
+                        juice.burst(this.target.x, this.target.y, '#0ff', 25, 120);
+                        juice.flash('#0ff', 0.2);
+                        haptics.heavy();
 
                         // Check if all planets owned for daily challenge
                         if (planets.every(p => p.owner === PLAYER)) {
                             currentGameStats.allPlanetsOwned = true;
                         }
+                        // Check achievements after capture
+                        achievements.check();
                     } else if (prevOwner === PLAYER) {
                         playerStats.planetsLost++;
                         currentGameStats.perfectWin = false;
                         currentGameStats.planetsLostThisGame++;
                         playSound('lose');
+                        // Lose planet juice
+                        juice.shake(10, 150);
+                        juice.burst(this.target.x, this.target.y, '#f44', 20, 100);
+                        haptics.error();
                     }
 
                     effects.push(new Effect('capture', this.target.x, this.target.y, {
@@ -2676,6 +3467,8 @@ function togglePlanetSelection(planet) {
         // Select
         game.selectedPlanets.push(planet);
         playSound('select');
+        haptics.light();
+        tutorial.onEvent('select');
     }
     updateSelectionIndicator();
 
@@ -2806,6 +3599,11 @@ function generateLevel() {
     
     document.getElementById('levelInfo').textContent = `Level ${game.level} • ${game.difficulty.toUpperCase()} • ${game.mode.toUpperCase()}`;
     updateSelectionIndicator();
+
+    // Start tutorial for first-time players
+    if (game.state === 'playing' && game.level === 1) {
+        tutorial.start();
+    }
 }
 
 function initBgParticles() {
@@ -2905,6 +3703,9 @@ function sendUnifiedAttack(target, percent) {
     if (game.selectedPlanets.length === 0) return;
 
     playSound('attack');
+    juice.shake(5, 100);
+    haptics.medium();
+    tutorial.onEvent('attack');
 
     // Track early attack for daily challenge
     if (currentGameStats.firstAttackTime === null) {
@@ -3152,11 +3953,29 @@ function endGame(victory) {
             playerStats.fastestWin = currentGameStats.gameTime;
         }
         playSound('victory');
+        // Victory juice!
+        juice.slowMo(0.2, 800);
+        juice.flash('#0ff', 0.5);
+        juice.shake(20, 400);
+        // Burst from all player planets
+        for (const p of planets) {
+            if (p.owner === PLAYER) {
+                juice.burst(p.x, p.y, '#0ff', 30, 200);
+            }
+        }
+        haptics.success();
     } else {
         playerStats.gamesLost++;
         playerStats.currentStreak = 0;
         playSound('defeat');
+        // Defeat juice
+        juice.shake(25, 500);
+        juice.flash('#f44', 0.4);
+        haptics.error();
     }
+
+    // Check achievements
+    achievements.check();
 
     // Save features for next session
     playerStats.features = { ...game.features };
@@ -3427,12 +4246,20 @@ let currentTouch = null;
 
 function animate(time) {
     const realDt = Math.min((time - lastTime) / 1000, 0.1);
-    const dt = realDt * game.speed;
+    const dt = realDt * game.speed * juice.getTimeScale();
     lastTime = time;
-    
+
+    // Update juice system
+    juice.update(realDt);
+
+    // Apply screen shake
+    const shake = juice.getShakeOffset();
+    ctx.save();
+    ctx.translate(shake.x, shake.y);
+
     ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, W, H);
-    
+    ctx.fillRect(-10, -10, W + 20, H + 20);
+
     for (const p of bgParticles) {
         p.update(realDt);
         p.draw();
@@ -3523,7 +4350,13 @@ function animate(time) {
         drawWormholeConnections();
         for (const planet of planets) planet.draw();
     }
-    
+
+    // Restore from screen shake
+    ctx.restore();
+
+    // Draw juice effects on top (particles, flash)
+    juice.draw(ctx, W, H);
+
     requestAnimationFrame(animate);
 }
 
@@ -3876,6 +4709,7 @@ initBgParticles();
 initDailyChallenges();
 updateDailyChallengesUI();
 loadSavedSettings();
+achievements.load();
 requestAnimationFrame(animate);
     </script>
 </body>
