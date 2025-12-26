@@ -3,9 +3,24 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+
+    <!-- PWA Meta Tags -->
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Conquest">
     <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#000000">
+    <meta name="description" content="Real-time strategy particle game - conquer the galaxy in epic 4v4 battles!">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+
+    <!-- iOS Icons (dynamically generated) -->
+    <link rel="apple-touch-icon" id="appleTouchIcon">
+
+    <!-- Splash Screens (iOS) -->
+    <meta name="apple-mobile-web-app-title" content="Conquest">
+
     <title>Particle Conquest Pro</title>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -441,37 +456,162 @@
         .result-screen {
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.9);
+            background: rgba(0,0,0,0.95);
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: center;
             z-index: 200;
+            overflow: hidden;
         }
-        
+
+        .result-screen::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 400px;
+            height: 400px;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: resultGlow 2s ease-in-out infinite;
+        }
+
+        .result-screen.victory::before {
+            background: radial-gradient(circle, #0ff 0%, transparent 70%);
+        }
+
+        .result-screen.defeat::before {
+            background: radial-gradient(circle, #f44 0%, transparent 70%);
+        }
+
+        @keyframes resultGlow {
+            0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.3; }
+            50% { transform: translate(-50%, -50%) scale(1.2); opacity: 0.5; }
+        }
+
         .result-screen h1 {
-            font-size: 56px;
-            margin-bottom: 15px;
+            font-size: 52px;
+            margin-bottom: 10px;
+            letter-spacing: 8px;
+            animation: titlePulse 0.8s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            position: relative;
+            z-index: 1;
         }
-        
-        .result-screen.victory h1 { color: #0ff; text-shadow: 0 0 50px #0ff; }
-        .result-screen.defeat h1 { color: #f44; text-shadow: 0 0 50px #f44; }
-        
-        .result-screen p {
+
+        @keyframes titlePulse {
+            0% { transform: scale(0) rotate(-10deg); opacity: 0; }
+            50% { transform: scale(1.2) rotate(3deg); }
+            100% { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        .result-screen.victory h1 {
+            color: #0ff;
+            text-shadow: 0 0 30px #0ff, 0 0 60px #0ff, 0 0 90px #08f;
+        }
+        .result-screen.defeat h1 {
+            color: #f44;
+            text-shadow: 0 0 30px #f44, 0 0 60px #f44, 0 0 90px #a00;
+        }
+
+        .result-subtitle {
             color: #888;
-            font-size: 18px;
-            margin-bottom: 25px;
+            font-size: 16px;
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 1;
         }
-        
+
+        .result-screen p {
+            color: #aaa;
+            font-size: 20px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-stats {
+            display: flex;
+            gap: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .result-stat {
+            text-align: center;
+        }
+
+        .result-stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            color: #fff;
+        }
+
+        .result-stat-label {
+            font-size: 11px;
+            color: #666;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .result-buttons {
+            display: flex;
+            gap: 15px;
+            position: relative;
+            z-index: 1;
+        }
+
         .play-again-btn {
-            padding: 12px 35px;
+            padding: 14px 40px;
             font-size: 16px;
             background: linear-gradient(135deg, #0ff, #0af);
             border: none;
             color: #000;
-            border-radius: 25px;
+            border-radius: 30px;
             cursor: pointer;
             font-weight: bold;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+        }
+
+        .play-again-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+        }
+
+        .share-btn {
+            padding: 14px 25px;
+            font-size: 16px;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid #444;
+            color: #fff;
+            border-radius: 30px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.2s;
+        }
+
+        .share-btn:hover {
+            border-color: #0ff;
+            background: rgba(0,255,255,0.1);
+        }
+
+        .menu-link-btn {
+            padding: 14px 25px;
+            font-size: 16px;
+            background: transparent;
+            border: 2px solid #333;
+            color: #666;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .menu-link-btn:hover {
+            border-color: #555;
+            color: #888;
         }
         
         /* Floating Combat Text */
@@ -1702,8 +1842,27 @@
 
     <div class="result-screen hidden" id="resultScreen">
         <h1 id="resultTitle">VICTORY!</h1>
+        <p class="result-subtitle" id="resultSubtitle"></p>
         <p id="resultText">You conquered the galaxy!</p>
-        <button class="play-again-btn" id="playAgainBtn">Play Again</button>
+        <div class="result-stats" id="resultStats">
+            <div class="result-stat">
+                <div class="result-stat-value" id="statTime">0:00</div>
+                <div class="result-stat-label">Time</div>
+            </div>
+            <div class="result-stat">
+                <div class="result-stat-value" id="statPlanets">0</div>
+                <div class="result-stat-label">Planets</div>
+            </div>
+            <div class="result-stat">
+                <div class="result-stat-value" id="statStreak">0</div>
+                <div class="result-stat-label">Streak</div>
+            </div>
+        </div>
+        <div class="result-buttons">
+            <button class="menu-link-btn" id="menuBtn">Menu</button>
+            <button class="play-again-btn" id="playAgainBtn">Continue</button>
+            <button class="share-btn" id="shareBtn">Share</button>
+        </div>
     </div>
 
     <script>
@@ -1946,6 +2105,109 @@ function playSound(type, options = {}) {
             }
         }
     } catch (e) { console.warn('Sound error:', e); }
+}
+
+// ==================== BACKGROUND MUSIC SYSTEM ====================
+let musicNodes = null;
+let musicPlaying = false;
+
+function startMusic() {
+    if (musicPlaying || !playerStats.settings.soundEnabled || !audioCtx) return;
+    if (audioCtx.state === 'suspended') audioCtx.resume();
+
+    try {
+        const vol = playerStats.settings.volume * 0.08;
+
+        // Create a simple ambient synth pad
+        const masterGain = audioCtx.createGain();
+        masterGain.gain.setValueAtTime(0, audioCtx.currentTime);
+        masterGain.gain.linearRampToValueAtTime(vol, audioCtx.currentTime + 2);
+        masterGain.connect(audioCtx.destination);
+
+        const filter = audioCtx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(800, audioCtx.currentTime);
+        filter.connect(masterGain);
+
+        // Chord notes (Cmaj7 ambient)
+        const notes = [130.81, 164.81, 196.00, 246.94]; // C3, E3, G3, B3
+        const oscillators = [];
+        const gains = [];
+
+        notes.forEach((freq, i) => {
+            const osc = audioCtx.createOscillator();
+            const oscGain = audioCtx.createGain();
+
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+
+            // Add subtle vibrato
+            const lfo = audioCtx.createOscillator();
+            const lfoGain = audioCtx.createGain();
+            lfo.frequency.setValueAtTime(0.2 + i * 0.1, audioCtx.currentTime);
+            lfoGain.gain.setValueAtTime(2, audioCtx.currentTime);
+            lfo.connect(lfoGain);
+            lfoGain.connect(osc.frequency);
+            lfo.start();
+
+            oscGain.gain.setValueAtTime(0.25, audioCtx.currentTime);
+            osc.connect(oscGain);
+            oscGain.connect(filter);
+            osc.start();
+
+            oscillators.push(osc, lfo);
+            gains.push(oscGain);
+        });
+
+        // Add subtle bass pulse
+        const bassOsc = audioCtx.createOscillator();
+        const bassGain = audioCtx.createGain();
+        bassOsc.type = 'sine';
+        bassOsc.frequency.setValueAtTime(65.41, audioCtx.currentTime); // C2
+        bassGain.gain.setValueAtTime(0.3, audioCtx.currentTime);
+        bassOsc.connect(bassGain);
+        bassGain.connect(filter);
+        bassOsc.start();
+        oscillators.push(bassOsc);
+        gains.push(bassGain);
+
+        musicNodes = { oscillators, gains, masterGain, filter };
+        musicPlaying = true;
+
+        // Animate filter for movement
+        function animateFilter() {
+            if (!musicPlaying) return;
+            const time = audioCtx.currentTime;
+            filter.frequency.setValueAtTime(600 + Math.sin(time * 0.3) * 300, time);
+            setTimeout(animateFilter, 100);
+        }
+        animateFilter();
+
+    } catch (e) {
+        console.warn('Music error:', e);
+    }
+}
+
+function stopMusic() {
+    if (!musicPlaying || !musicNodes) return;
+
+    try {
+        const now = audioCtx.currentTime;
+        musicNodes.masterGain.gain.linearRampToValueAtTime(0, now + 1);
+
+        setTimeout(() => {
+            if (musicNodes) {
+                musicNodes.oscillators.forEach(osc => {
+                    try { osc.stop(); } catch(e) {}
+                });
+                musicNodes = null;
+            }
+        }, 1200);
+    } catch (e) {
+        console.warn('Stop music error:', e);
+    }
+
+    musicPlaying = false;
 }
 
 // ==================== DAILY CHALLENGES SYSTEM ====================
@@ -4941,20 +5203,74 @@ function endGame(victory) {
 
     const screen = document.getElementById('resultScreen');
     const title = document.getElementById('resultTitle');
+    const subtitle = document.getElementById('resultSubtitle');
     const text = document.getElementById('resultText');
+
+    // Format time
+    const mins = Math.floor(currentGameStats.gameTime / 60);
+    const secs = Math.floor(currentGameStats.gameTime % 60);
+    document.getElementById('statTime').textContent = `${mins}:${secs.toString().padStart(2, '0')}`;
+    document.getElementById('statPlanets').textContent = playerStats.planetsConquered;
+    document.getElementById('statStreak').textContent = playerStats.currentStreak;
 
     if (victory) {
         screen.className = 'result-screen victory';
         title.textContent = 'VICTORY!';
+        subtitle.textContent = game.difficulty.toUpperCase();
         text.textContent = `Level ${game.level} conquered!`;
+
+        // Special messages
+        if (currentGameStats.perfectWin) {
+            text.textContent += ' Perfect win!';
+        }
+        if (currentGameStats.gameTime < 30) {
+            text.textContent = 'SPEEDRUN! ' + text.textContent;
+        }
+
         game.level++;
     } else {
         screen.className = 'result-screen defeat';
         title.textContent = 'DEFEAT';
-        text.textContent = 'The enemy has won...';
+        subtitle.textContent = `Level ${game.level}`;
+        text.textContent = 'The enemy has conquered the galaxy...';
     }
 
     screen.classList.remove('hidden');
+}
+
+// Share functionality
+function shareScore() {
+    const won = game.state === 'ended' && playerStats.currentStreak > 0;
+    const emoji = won ? '🏆' : '💥';
+    const streakEmoji = '🔥'.repeat(Math.min(playerStats.currentStreak, 5));
+
+    const text = `${emoji} Particle Conquest Pro ${emoji}
+Level ${game.level} | ${game.difficulty.toUpperCase()}
+${streakEmoji} ${playerStats.currentStreak} win streak!
+🎮 Play free: ${window.location.href}`;
+
+    if (navigator.share) {
+        navigator.share({
+            title: 'Particle Conquest Pro',
+            text: text,
+            url: window.location.href
+        }).catch(() => {});
+    } else {
+        // Fallback: copy to clipboard
+        navigator.clipboard.writeText(text).then(() => {
+            showFloatText(W/2, H/2, 'Copied to clipboard!', '#0ff');
+        }).catch(() => {
+            showFloatText(W/2, H/2, 'Share not available', '#f44');
+        });
+    }
+}
+
+function goToMenu() {
+    document.getElementById('resultScreen').classList.add('hidden');
+    document.getElementById('menu').classList.remove('hidden');
+    document.getElementById('pauseBtn').classList.add('hidden');
+    game.state = 'menu';
+    stopMusic();
 }
 
 function startGame(difficulty) {
@@ -4968,6 +5284,7 @@ function startGame(difficulty) {
 
     playSound('click');
     initAudio();
+    startMusic();
 
     document.getElementById('menu').classList.add('hidden');
     document.getElementById('resultScreen').classList.add('hidden');
@@ -5486,7 +5803,12 @@ document.getElementById('playAgainBtn').addEventListener('click', () => {
     playerHarvested = 0;
     enemyHarvested = 0;
     generateLevel();
+    startMusic();
 });
+
+document.getElementById('shareBtn').addEventListener('click', shareScore);
+
+document.getElementById('menuBtn').addEventListener('click', goToMenu);
 
 document.querySelectorAll('.percent-btn').forEach(btn => {
     btn.addEventListener('click', function() {
@@ -5692,7 +6014,146 @@ function loadSavedSettings() {
     soundBtn.classList.toggle('muted', !playerStats.settings.soundEnabled);
 }
 
+// ==================== PWA & APP INITIALIZATION ====================
+
+// Generate app icons programmatically
+function generateAppIcons() {
+    const sizes = [192, 512];
+    sizes.forEach(size => {
+        const iconCanvas = document.createElement('canvas');
+        iconCanvas.width = size;
+        iconCanvas.height = size;
+        const iconCtx = iconCanvas.getContext('2d');
+
+        // Background
+        const grad = iconCtx.createRadialGradient(size/2, size/2, 0, size/2, size/2, size/2);
+        grad.addColorStop(0, '#001a33');
+        grad.addColorStop(1, '#000011');
+        iconCtx.fillStyle = grad;
+        iconCtx.fillRect(0, 0, size, size);
+
+        // Outer glow ring
+        iconCtx.strokeStyle = '#00ffff';
+        iconCtx.lineWidth = size * 0.02;
+        iconCtx.shadowColor = '#00ffff';
+        iconCtx.shadowBlur = size * 0.1;
+        iconCtx.beginPath();
+        iconCtx.arc(size/2, size/2, size * 0.35, 0, Math.PI * 2);
+        iconCtx.stroke();
+
+        // Center planet
+        const planetGrad = iconCtx.createRadialGradient(size*0.45, size*0.45, 0, size/2, size/2, size*0.25);
+        planetGrad.addColorStop(0, '#00ffff');
+        planetGrad.addColorStop(0.5, '#0088aa');
+        planetGrad.addColorStop(1, '#004466');
+        iconCtx.fillStyle = planetGrad;
+        iconCtx.shadowBlur = size * 0.15;
+        iconCtx.beginPath();
+        iconCtx.arc(size/2, size/2, size * 0.22, 0, Math.PI * 2);
+        iconCtx.fill();
+
+        // Orbiting particles
+        iconCtx.shadowBlur = size * 0.05;
+        for (let i = 0; i < 6; i++) {
+            const angle = (i / 6) * Math.PI * 2;
+            const dist = size * 0.35;
+            const px = size/2 + Math.cos(angle) * dist;
+            const py = size/2 + Math.sin(angle) * dist;
+            iconCtx.fillStyle = i % 2 === 0 ? '#00ffff' : '#ff4444';
+            iconCtx.beginPath();
+            iconCtx.arc(px, py, size * 0.03, 0, Math.PI * 2);
+            iconCtx.fill();
+        }
+
+        // Save as blob URL and update link tags
+        iconCanvas.toBlob(blob => {
+            if (!blob) return;
+            const url = URL.createObjectURL(blob);
+            // Update apple touch icon for iOS
+            if (size === 192) {
+                const appleTouchIcon = document.getElementById('appleTouchIcon');
+                if (appleTouchIcon) appleTouchIcon.href = url;
+            }
+        });
+    });
+}
+
+// Register service worker
+async function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        try {
+            const reg = await navigator.serviceWorker.register('sw.js');
+            console.log('Service Worker registered:', reg.scope);
+        } catch (e) {
+            console.log('Service Worker registration failed:', e);
+        }
+    }
+}
+
+// Loading screen
+function showLoadingScreen() {
+    const loader = document.createElement('div');
+    loader.id = 'loadingScreen';
+    loader.innerHTML = `
+        <style>
+            #loadingScreen {
+                position: fixed;
+                inset: 0;
+                background: #000;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                z-index: 10000;
+                transition: opacity 0.5s;
+            }
+            #loadingScreen.fade-out {
+                opacity: 0;
+                pointer-events: none;
+            }
+            .loader-title {
+                font-size: 28px;
+                font-weight: bold;
+                color: #0ff;
+                text-shadow: 0 0 20px #0ff;
+                margin-bottom: 30px;
+                letter-spacing: 3px;
+            }
+            .loader-ring {
+                width: 80px;
+                height: 80px;
+                border: 4px solid rgba(0,255,255,0.2);
+                border-top-color: #0ff;
+                border-radius: 50%;
+                animation: spin 1s linear infinite;
+            }
+            .loader-text {
+                margin-top: 20px;
+                color: #666;
+                font-size: 14px;
+            }
+            @keyframes spin {
+                to { transform: rotate(360deg); }
+            }
+        </style>
+        <div class="loader-title">PARTICLE CONQUEST</div>
+        <div class="loader-ring"></div>
+        <div class="loader-text">Loading...</div>
+    `;
+    document.body.appendChild(loader);
+}
+
+function hideLoadingScreen() {
+    const loader = document.getElementById('loadingScreen');
+    if (loader) {
+        loader.classList.add('fade-out');
+        setTimeout(() => loader.remove(), 500);
+    }
+}
+
 // Init
+showLoadingScreen();
+
 window.addEventListener('resize', resize);
 resize();
 initBgParticles();
@@ -5700,7 +6161,16 @@ initDailyChallenges();
 updateDailyChallengesUI();
 loadSavedSettings();
 achievements.load();
-requestAnimationFrame(animate);
+
+// Generate icons and register SW
+generateAppIcons();
+registerServiceWorker();
+
+// Start game loop and hide loader
+setTimeout(() => {
+    hideLoadingScreen();
+    requestAnimationFrame(animate);
+}, 800);
     </script>
 </body>
 </html>
