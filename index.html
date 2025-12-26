@@ -862,6 +862,170 @@
             color: #f44;
         }
 
+        /* Team Lobby Styles */
+        .room-header {
+            text-align: center;
+            margin-bottom: 15px;
+        }
+
+        .connection-status {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 11px;
+            color: #888;
+            margin-top: 8px;
+        }
+
+        .ping-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4f4;
+            animation: pulse 2s infinite;
+        }
+
+        .ping-dot.warning { background: #fa0; }
+        .ping-dot.bad { background: #f44; }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .team-columns {
+            display: flex;
+            gap: 15px;
+            margin: 15px 0;
+        }
+
+        .team-col {
+            flex: 1;
+            background: rgba(0, 0, 0, 0.4);
+            border-radius: 12px;
+            padding: 12px;
+            min-height: 180px;
+        }
+
+        .team-header {
+            font-size: 14px;
+            margin: 0 0 10px 0;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #333;
+        }
+
+        .team-header.team-0 { color: #0ff; border-color: #0ff3; }
+        .team-header.team-1 { color: #f44; border-color: #f443; }
+
+        .player-slots {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            min-height: 100px;
+        }
+
+        .player-slot {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 10px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+            font-size: 13px;
+        }
+
+        .player-slot.is-you {
+            background: rgba(0, 255, 255, 0.1);
+            border: 1px solid #0ff3;
+        }
+
+        .player-slot.is-ai {
+            background: rgba(255, 255, 255, 0.03);
+            color: #888;
+        }
+
+        .player-slot .player-icon {
+            font-size: 16px;
+        }
+
+        .player-slot .player-name {
+            flex: 1;
+        }
+
+        .player-slot .player-ping {
+            font-size: 10px;
+            color: #666;
+        }
+
+        .player-slot .remove-btn {
+            background: none;
+            border: none;
+            color: #f44;
+            cursor: pointer;
+            padding: 2px 6px;
+            font-size: 14px;
+            opacity: 0.6;
+        }
+
+        .player-slot .remove-btn:hover {
+            opacity: 1;
+        }
+
+        .add-ai-btn {
+            width: 100%;
+            margin-top: 8px;
+            padding: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px dashed #444;
+            border-radius: 8px;
+            color: #666;
+            font-size: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-ai-btn:hover {
+            border-color: #888;
+            color: #aaa;
+        }
+
+        .player-count {
+            text-align: center;
+            color: #888;
+            font-size: 12px;
+            margin: 10px 0;
+        }
+
+        .lobby-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-top: 15px;
+        }
+
+        .lobby-btn.switch-team {
+            background: #222;
+        }
+
+        .lobby-btn.start-btn {
+            min-width: 140px;
+        }
+
+        .lobby-btn.start-btn:disabled {
+            background: #333;
+            color: #666;
+            cursor: not-allowed;
+        }
+
+        .lobby-btn.start-btn:not(:disabled) {
+            animation: readyPulse 1.5s infinite;
+        }
+
+        @keyframes readyPulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(0, 255, 255, 0.4); }
+            50% { box-shadow: 0 0 20px 5px rgba(0, 255, 255, 0.2); }
+        }
+
         /* Menu buttons for new features */
         .menu-actions {
             display: flex;
@@ -1292,40 +1456,65 @@
 
     <!-- Multiplayer Lobby -->
     <div class="multiplayer-lobby hidden" id="multiplayerLobby">
-        <h1 id="lobbyTitle">🌐 Multiplayer</h1>
+        <h1 id="lobbyTitle">🌐 Online Battle</h1>
         <p class="lobby-status" id="lobbyStatus">Choose an option</p>
 
-        <!-- Game Mode Selection -->
-        <div id="gameModeContainer" class="lobby-section">
-            <p style="color:#888; font-size:12px; margin-bottom:10px;">Game Mode</p>
-            <div class="mode-toggle-btns">
-                <button class="mode-toggle-btn active" data-mpmode="pvp">⚔️ PvP</button>
-                <button class="mode-toggle-btn" data-mpmode="coop">🤝 Co-op vs AI</button>
+        <!-- Initial Options (before hosting/joining) -->
+        <div id="lobbyInitial">
+            <div id="joinCodeContainer">
+                <input type="text" class="join-code-input" id="joinCodeInput" placeholder="ENTER CODE" maxlength="6">
+            </div>
+            <div class="lobby-buttons">
+                <button class="lobby-btn" id="lobbyBackBtn">← Back</button>
+                <button class="lobby-btn primary" id="lobbyHostBtn">🎮 Host Game</button>
+                <button class="lobby-btn primary" id="lobbyJoinBtn">🔗 Join Game</button>
             </div>
         </div>
 
-        <!-- AI Count (only shown in co-op mode) -->
-        <div id="aiCountContainer" class="lobby-section hidden">
-            <p style="color:#888; font-size:12px; margin-bottom:10px;">Number of AI Opponents</p>
-            <div class="mode-toggle-btns">
-                <button class="ai-count-btn active" data-ai="1">1 AI</button>
-                <button class="ai-count-btn" data-ai="2">2 AIs</button>
+        <!-- Lobby Room (after hosting/joining) -->
+        <div id="lobbyRoom" class="hidden">
+            <div class="room-header">
+                <div class="room-code-display" id="roomCodeDisplay">------</div>
+                <p style="color:#888; font-size:11px;">Share code with friends</p>
+                <div class="connection-status" id="connectionStatus">
+                    <span class="ping-dot"></span>
+                    <span id="pingValue">--</span>ms
+                </div>
             </div>
-        </div>
 
-        <div id="roomCodeContainer" class="hidden">
-            <div class="room-code-display" id="roomCodeDisplay">------</div>
-            <p style="color:#888; font-size:12px;">Share this code with your teammate</p>
-        </div>
+            <!-- Game Mode Toggle -->
+            <div id="gameModeContainer" class="lobby-section">
+                <div class="mode-toggle-btns">
+                    <button class="mode-toggle-btn active" data-mpmode="coop">🤝 Co-op vs AI</button>
+                    <button class="mode-toggle-btn" data-mpmode="pvp">⚔️ Team PvP</button>
+                </div>
+            </div>
 
-        <div id="joinCodeContainer">
-            <input type="text" class="join-code-input" id="joinCodeInput" placeholder="ENTER CODE" maxlength="6">
-        </div>
+            <!-- Team Columns -->
+            <div class="team-columns" id="teamColumns">
+                <div class="team-col" data-team="0">
+                    <h3 class="team-header team-0">🔵 Team Cyan</h3>
+                    <div class="player-slots" id="team0Slots"></div>
+                    <button class="add-ai-btn" data-team="0">+ Add AI</button>
+                </div>
+                <div class="team-col" data-team="1">
+                    <h3 class="team-header team-1">🔴 Team Red</h3>
+                    <div class="player-slots" id="team1Slots"></div>
+                    <button class="add-ai-btn" data-team="1">+ Add AI</button>
+                </div>
+            </div>
 
-        <div class="lobby-buttons">
-            <button class="lobby-btn" id="lobbyBackBtn">← Back</button>
-            <button class="lobby-btn primary" id="lobbyHostBtn">Host Game</button>
-            <button class="lobby-btn primary" id="lobbyJoinBtn">Join Game</button>
+            <!-- Player Count -->
+            <div class="player-count" id="playerCount">
+                <span id="humanCount">1</span> Players • <span id="aiCount">0</span> AI
+            </div>
+
+            <!-- Lobby Actions -->
+            <div class="lobby-actions">
+                <button class="lobby-btn" id="lobbyLeaveBtn">Leave</button>
+                <button class="lobby-btn switch-team" id="switchTeamBtn">Switch Team</button>
+                <button class="lobby-btn primary start-btn" id="startGameBtn" disabled>Start Game</button>
+            </div>
         </div>
     </div>
 
@@ -1855,16 +2044,41 @@ function checkDailyChallenges() {
     }
 }
 
-// ==================== MULTIPLAYER SYSTEM (PeerJS) ====================
+// ==================== MULTIPLAYER SYSTEM (PeerJS) - 4v4 Support ====================
+
+// Team colors and configuration
+const TEAM_COLORS = {
+    0: { primary: '#0ff', name: 'Cyan', glow: 'rgba(0,255,255,0.5)' },
+    1: { primary: '#f44', name: 'Red', glow: 'rgba(255,68,68,0.5)' },
+    2: { primary: '#f90', name: 'Orange', glow: 'rgba(255,153,0,0.5)' },
+    3: { primary: '#a4f', name: 'Purple', glow: 'rgba(170,68,255,0.5)' }
+};
+
+// Multiplayer state
 let peer = null;
-let conn = null;
 let isHost = false;
 let multiplayerActive = false;
-let opponentName = 'Opponent';
 let roomCode = '';
-let isCoopMode = false;
-let numAIEnemies = 1;
-let mpGameMode = 'pvp'; // 'pvp' or 'coop'
+let myPlayerId = null;
+let myPlayerName = localStorage.getItem('playerName') || 'Player';
+let mpGameMode = 'coop'; // 'coop' or 'pvp'
+
+// Connection management for multiple players
+const connections = new Map(); // peerId -> { conn, player }
+let hostConnection = null; // For clients: connection to host
+
+// Lobby state
+const lobby = {
+    players: [], // { id, name, team, isAI, isHost, ping }
+    maxPlayers: 8,
+    started: false
+};
+
+// Sync state
+let syncInterval = null;
+let pingInterval = null;
+let lastPingTime = 0;
+let currentPing = 0;
 
 function generateRoomCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -1875,7 +2089,6 @@ function generateRoomCode() {
 
 async function initPeerJS() {
     return new Promise((resolve, reject) => {
-        // Load PeerJS from CDN if not loaded
         if (typeof Peer === 'undefined') {
             const script = document.createElement('script');
             script.src = 'https://unpkg.com/peerjs@1.5.2/dist/peerjs.min.js';
@@ -1888,25 +2101,37 @@ async function initPeerJS() {
     });
 }
 
+// ==================== HOST FUNCTIONS ====================
+
 async function hostGame() {
     try {
         await initPeerJS();
         roomCode = generateRoomCode();
-        isCoopMode = mpGameMode === 'coop';
         peer = new Peer('pcp-' + roomCode);
 
         peer.on('open', id => {
             isHost = true;
-            showMultiplayerLobby(true);
+            myPlayerId = id;
+
+            // Add host to lobby
+            lobby.players = [{
+                id: myPlayerId,
+                name: myPlayerName,
+                team: 0,
+                isAI: false,
+                isHost: true,
+                ping: 0
+            }];
+
+            showLobbyRoom();
+            playSound('click');
         });
 
-        peer.on('connection', connection => {
-            conn = connection;
-            setupConnection();
-        });
+        peer.on('connection', handleNewConnection);
 
         peer.on('error', err => {
             console.error('Peer error:', err);
+            document.getElementById('lobbyStatus').textContent = 'Connection error!';
             showFloatText(W / 2, H / 2, 'Connection error!', '#f44');
         });
     } catch (e) {
@@ -1914,22 +2139,155 @@ async function hostGame() {
     }
 }
 
+function handleNewConnection(conn) {
+    if (lobby.players.filter(p => !p.isAI).length >= 8) {
+        conn.on('open', () => {
+            conn.send({ type: 'error', message: 'Room is full' });
+            conn.close();
+        });
+        return;
+    }
+
+    conn.on('open', () => {
+        connections.set(conn.peer, { conn, player: null });
+
+        // Wait for player info
+        conn.on('data', data => handleHostData(conn.peer, data));
+        conn.on('close', () => handlePlayerDisconnect(conn.peer));
+    });
+}
+
+function handleHostData(peerId, data) {
+    const connection = connections.get(peerId);
+
+    switch(data.type) {
+        case 'join':
+            // New player joining
+            const newPlayer = {
+                id: peerId,
+                name: data.name || 'Player',
+                team: getAutoTeam(),
+                isAI: false,
+                isHost: false,
+                ping: 0
+            };
+            lobby.players.push(newPlayer);
+            connection.player = newPlayer;
+
+            playSound('click');
+
+            // Send current lobby state to new player
+            broadcastLobbyState();
+            updateLobbyUI();
+            break;
+
+        case 'switchTeam':
+            const player = lobby.players.find(p => p.id === peerId);
+            if (player && !lobby.started) {
+                player.team = data.team;
+                broadcastLobbyState();
+                updateLobbyUI();
+            }
+            break;
+
+        case 'command':
+            // Player command during game
+            if (lobby.started) {
+                executePlayerCommand(peerId, data);
+            }
+            break;
+
+        case 'pong':
+            const pongPlayer = lobby.players.find(p => p.id === peerId);
+            if (pongPlayer) {
+                pongPlayer.ping = Date.now() - data.t;
+            }
+            break;
+    }
+}
+
+function getAutoTeam() {
+    // Auto-assign to team with fewer players
+    const team0Count = lobby.players.filter(p => p.team === 0).length;
+    const team1Count = lobby.players.filter(p => p.team === 1).length;
+    return team0Count <= team1Count ? 0 : 1;
+}
+
+function broadcastLobbyState() {
+    const state = {
+        type: 'lobbyState',
+        players: lobby.players,
+        gameMode: mpGameMode,
+        roomCode: roomCode
+    };
+    broadcast(state);
+}
+
+function broadcast(data) {
+    for (const [id, { conn }] of connections) {
+        if (conn && conn.open) {
+            conn.send(data);
+        }
+    }
+}
+
+function handlePlayerDisconnect(peerId) {
+    connections.delete(peerId);
+
+    const playerIdx = lobby.players.findIndex(p => p.id === peerId);
+    if (playerIdx !== -1) {
+        const player = lobby.players[playerIdx];
+
+        if (lobby.started) {
+            // During game: convert to AI
+            player.isAI = true;
+            player.name = '🤖 ' + player.name;
+            showFloatText(W / 2, 100, `${player.name} disconnected (AI takeover)`, '#fa0');
+        } else {
+            // In lobby: remove player
+            lobby.players.splice(playerIdx, 1);
+        }
+
+        broadcastLobbyState();
+        updateLobbyUI();
+    }
+}
+
+// ==================== CLIENT FUNCTIONS ====================
+
 async function joinGame(code) {
     try {
         await initPeerJS();
         roomCode = code.toUpperCase();
         peer = new Peer();
 
-        peer.on('open', () => {
-            conn = peer.connect('pcp-' + roomCode);
-            conn.on('open', () => {
+        peer.on('open', id => {
+            myPlayerId = id;
+            hostConnection = peer.connect('pcp-' + roomCode);
+
+            hostConnection.on('open', () => {
+                // Send join request
+                hostConnection.send({
+                    type: 'join',
+                    name: myPlayerName
+                });
+
                 isHost = false;
-                setupConnection();
+                showLobbyRoom();
+                playSound('click');
+            });
+
+            hostConnection.on('data', handleClientData);
+
+            hostConnection.on('close', () => {
+                showFloatText(W / 2, H / 2, 'Disconnected from host', '#f44');
+                endMultiplayerGame();
             });
         });
 
         peer.on('error', err => {
             console.error('Peer error:', err);
+            document.getElementById('lobbyStatus').textContent = 'Room not found!';
             showFloatText(W / 2, H / 2, 'Room not found!', '#f44');
         });
     } catch (e) {
@@ -1937,171 +2295,485 @@ async function joinGame(code) {
     }
 }
 
-function setupConnection() {
-    multiplayerActive = true;
+function handleClientData(data) {
+    switch(data.type) {
+        case 'lobbyState':
+            lobby.players = data.players;
+            mpGameMode = data.gameMode;
+            roomCode = data.roomCode;
+            updateLobbyUI();
+            break;
 
-    conn.on('data', data => {
-        handleMultiplayerData(data);
-    });
+        case 'gameStart':
+            startClientGame(data);
+            break;
 
-    conn.on('close', () => {
-        multiplayerActive = false;
-        showFloatText(W / 2, H / 2, 'Opponent disconnected', '#f44');
-        endMultiplayerGame();
+        case 'tick':
+            // Authoritative game state from host
+            applyGameTick(data);
+            break;
+
+        case 'ping':
+            hostConnection.send({ type: 'pong', t: data.t });
+            break;
+
+        case 'gameEnd':
+            endGame(data.victory);
+            break;
+
+        case 'error':
+            showFloatText(W / 2, H / 2, data.message, '#f44');
+            endMultiplayerGame();
+            break;
+    }
+}
+
+function sendToHost(data) {
+    if (hostConnection && hostConnection.open) {
+        hostConnection.send(data);
+    }
+}
+
+// ==================== LOBBY UI ====================
+
+function showLobbyRoom() {
+    document.getElementById('lobbyInitial').classList.add('hidden');
+    document.getElementById('lobbyRoom').classList.remove('hidden');
+    document.getElementById('roomCodeDisplay').textContent = roomCode;
+    document.getElementById('lobbyStatus').textContent = isHost ? 'Waiting for players...' : 'Connected!';
+
+    // Show/hide host-only elements
+    document.querySelectorAll('.add-ai-btn').forEach(btn => {
+        btn.style.display = isHost ? 'block' : 'none';
     });
+    document.getElementById('gameModeContainer').style.display = isHost ? 'block' : 'none';
+    document.getElementById('startGameBtn').style.display = isHost ? 'block' : 'none';
+
+    updateLobbyUI();
+    startPingLoop();
+}
+
+function updateLobbyUI() {
+    const team0Slots = document.getElementById('team0Slots');
+    const team1Slots = document.getElementById('team1Slots');
+
+    team0Slots.innerHTML = '';
+    team1Slots.innerHTML = '';
+
+    let humanCount = 0;
+    let aiCount = 0;
+
+    for (const player of lobby.players) {
+        const slot = document.createElement('div');
+        slot.className = 'player-slot';
+        if (player.id === myPlayerId) slot.classList.add('is-you');
+        if (player.isAI) slot.classList.add('is-ai');
+
+        const icon = player.isAI ? '🤖' : (player.isHost ? '👑' : '👤');
+        const pingText = player.isAI ? '' : `<span class="player-ping">${player.ping}ms</span>`;
+        const youBadge = player.id === myPlayerId ? ' <span style="color:#0ff;font-size:10px;">(You)</span>' : '';
+
+        let removeBtn = '';
+        if (isHost && (player.isAI || (!player.isHost && player.id !== myPlayerId))) {
+            removeBtn = `<button class="remove-btn" data-id="${player.id}">✕</button>`;
+        }
+
+        slot.innerHTML = `
+            <span class="player-icon">${icon}</span>
+            <span class="player-name">${player.name}${youBadge}</span>
+            ${pingText}
+            ${removeBtn}
+        `;
+
+        if (player.team === 0) {
+            team0Slots.appendChild(slot);
+        } else {
+            team1Slots.appendChild(slot);
+        }
+
+        if (player.isAI) aiCount++;
+        else humanCount++;
+    }
+
+    document.getElementById('humanCount').textContent = humanCount;
+    document.getElementById('aiCount').textContent = aiCount;
+
+    // Update start button
+    const startBtn = document.getElementById('startGameBtn');
+    const canStart = lobby.players.length >= 2 &&
+                     lobby.players.filter(p => p.team === 0).length > 0 &&
+                     lobby.players.filter(p => p.team === 1).length > 0;
+    startBtn.disabled = !canStart;
+    startBtn.textContent = canStart ? '▶ Start Game' : 'Need players on both teams';
+
+    // Update status
+    if (!lobby.started) {
+        document.getElementById('lobbyStatus').textContent =
+            `${humanCount} player${humanCount !== 1 ? 's' : ''} connected`;
+    }
+
+    // Add click handlers for remove buttons
+    document.querySelectorAll('.remove-btn').forEach(btn => {
+        btn.onclick = () => removePlayer(btn.dataset.id);
+    });
+}
+
+function addAI(team) {
+    if (!isHost) return;
+
+    const aiCount = lobby.players.filter(p => p.isAI).length;
+    if (lobby.players.length >= 8) {
+        showFloatText(W / 2, H / 2, 'Room is full!', '#fa0');
+        return;
+    }
+
+    const aiPlayer = {
+        id: 'ai-' + Date.now() + '-' + Math.random().toString(36).substr(2, 4),
+        name: `AI ${aiCount + 1}`,
+        team: team,
+        isAI: true,
+        isHost: false,
+        ping: 0
+    };
+
+    lobby.players.push(aiPlayer);
+    playSound('click');
+    broadcastLobbyState();
+    updateLobbyUI();
+}
+
+function removePlayer(playerId) {
+    if (!isHost) return;
+
+    const idx = lobby.players.findIndex(p => p.id === playerId);
+    if (idx !== -1 && !lobby.players[idx].isHost) {
+        const player = lobby.players[idx];
+
+        // If it's a real player, close their connection
+        if (!player.isAI && connections.has(playerId)) {
+            connections.get(playerId).conn.close();
+            connections.delete(playerId);
+        }
+
+        lobby.players.splice(idx, 1);
+        playSound('click');
+        broadcastLobbyState();
+        updateLobbyUI();
+    }
+}
+
+function switchTeam() {
+    const myPlayer = lobby.players.find(p => p.id === myPlayerId);
+    if (!myPlayer || lobby.started) return;
+
+    const newTeam = myPlayer.team === 0 ? 1 : 0;
 
     if (isHost) {
-        // Host starts the game
-        showFloatText(W / 2, H / 2, 'Opponent joined!', '#0f0');
-        setTimeout(() => startMultiplayerGame(), 1000);
+        myPlayer.team = newTeam;
+        broadcastLobbyState();
+        updateLobbyUI();
     } else {
-        showFloatText(W / 2, H / 2, 'Connected!', '#0f0');
+        sendToHost({ type: 'switchTeam', team: newTeam });
     }
+
+    playSound('click');
 }
 
-function sendMultiplayerData(data) {
-    if (conn && conn.open) {
-        conn.send(data);
-    }
-}
+function setGameMode(mode) {
+    if (!isHost) return;
+    mpGameMode = mode;
 
-function handleMultiplayerData(data) {
-    switch(data.type) {
-        case 'gameState':
-            // Sync game state from host (includes mode info)
-            if (!isHost) {
-                isCoopMode = data.isCoopMode || false;
-                numAIEnemies = data.numAIEnemies || 1;
-                syncGameState(data.state);
-            }
-            break;
-        case 'attack':
-            // Teammate or opponent sent an attack
-            if (isCoopMode) {
-                executeTeammateAttack(data);
-            } else {
-                executeOpponentAttack(data);
-            }
-            break;
-        case 'ability':
-            // Opponent/teammate used an ability
-            executeOpponentAbility(data);
-            break;
-        case 'sync':
-            // Periodic sync
-            if (!isHost) {
-                syncPlanets(data.planets);
-            }
-            break;
-    }
-}
-
-function syncGameState(state) {
-    // Sync initial game state
-    planets.forEach((p, i) => {
-        if (state.planets[i]) {
-            p.units = state.planets[i].units;
-            p.owner = state.planets[i].owner;
-        }
+    // Update UI
+    document.querySelectorAll('.mode-toggle-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.mpmode === mode);
     });
+
+    broadcastLobbyState();
+    playSound('click');
 }
 
-function syncPlanets(planetData) {
-    planetData.forEach((pd, i) => {
-        if (planets[i]) {
-            planets[i].units = pd.units;
-            planets[i].owner = pd.owner;
+function startPingLoop() {
+    if (pingInterval) clearInterval(pingInterval);
+
+    pingInterval = setInterval(() => {
+        if (isHost) {
+            // Host pings all clients
+            lastPingTime = Date.now();
+            broadcast({ type: 'ping', t: lastPingTime });
         }
-    });
+    }, 2000);
 }
 
-function executeOpponentAttack(data) {
-    // PvP mode: opponent attacks as ENEMY
-    const source = planets[data.sourceIdx];
-    const target = planets[data.targetIdx];
-    if (source && target) {
-        const units = Math.floor(source.units * (data.percent / 100));
-        source.units -= units;
-        for (let i = 0; i < units; i++) {
-            setTimeout(() => {
-                const angle = Math.random() * Math.PI * 2;
-                const dist = source.size + 5;
-                flyingParticles.push(new FlyingParticle(
-                    source.x + Math.cos(angle) * dist,
-                    source.y + Math.sin(angle) * dist,
-                    target,
-                    ENEMY
-                ));
-            }, i * 30);
-        }
-    }
-}
-
-function executeTeammateAttack(data) {
-    // Co-op mode: teammate attacks as PLAYER (same team)
-    const source = planets[data.sourceIdx];
-    const target = planets[data.targetIdx];
-    if (source && target) {
-        const units = Math.floor(source.units * (data.percent / 100));
-        source.units -= units;
-        playSound('attack');
-        juice.shake(3, 80);
-        for (let i = 0; i < units; i++) {
-            setTimeout(() => {
-                const angle = Math.random() * Math.PI * 2;
-                const dist = source.size + 5;
-                flyingParticles.push(new FlyingParticle(
-                    source.x + Math.cos(angle) * dist,
-                    source.y + Math.sin(angle) * dist,
-                    target,
-                    PLAYER
-                ));
-            }, i * 30);
-        }
-    }
-}
-
-function executeOpponentAbility(data) {
-    // Handle opponent/teammate ability usage
-    if (isCoopMode) {
-        showFloatText(W / 2, 100, `Teammate used ${data.ability}!`, '#0ff');
-    } else {
-        showFloatText(W / 2, 100, `Opponent used ${data.ability}!`, '#f44');
-    }
-}
+// ==================== GAME START ====================
 
 function startMultiplayerGame() {
-    game.state = 'playing';
+    if (!isHost || lobby.started) return;
+
+    lobby.started = true;
+    playSound('ability');
+
+    // Generate game seed
+    const gameSeed = roomCode.split('').reduce((a, c) => a + c.charCodeAt(0), 0) + Date.now();
+
+    // Generate level on host
+    generateMultiplayerLevel(gameSeed);
+
+    // Hide lobby, show game
     document.getElementById('multiplayerLobby').classList.add('hidden');
     document.getElementById('menu').classList.add('hidden');
     document.getElementById('pauseBtn').classList.remove('hidden');
 
-    // Generate level with fixed seed for both players
-    const mpSeed = roomCode.split('').reduce((a, c) => a + c.charCodeAt(0), 0);
-    generateMultiplayerLevel(mpSeed);
+    multiplayerActive = true;
+    game.state = 'playing';
 
-    if (isHost) {
-        // Send initial state to opponent (including game mode info)
-        setTimeout(() => {
-            sendMultiplayerData({
-                type: 'gameState',
-                isCoopMode: isCoopMode,
-                numAIEnemies: numAIEnemies,
-                state: {
-                    planets: planets.map(p => ({ units: p.units, owner: p.owner, x: p.x, y: p.y, size: p.size }))
-                }
-            });
-        }, 500);
+    // Send game start to all clients
+    broadcast({
+        type: 'gameStart',
+        seed: gameSeed,
+        players: lobby.players,
+        gameMode: mpGameMode,
+        planets: planets.map(p => ({
+            x: p.x, y: p.y, size: p.size, type: p.type,
+            owner: p.owner, units: p.units
+        }))
+    });
 
-        // If co-op mode, start AI sync loop
-        if (isCoopMode) {
-            startCoopAISync();
+    // Start game tick loop (host-authoritative)
+    startGameTickLoop();
+
+    // Update HUD
+    updateMultiplayerHUD();
+}
+
+function startClientGame(data) {
+    lobby.players = data.players;
+    mpGameMode = data.gameMode;
+
+    // Recreate planets from host data
+    planets = [];
+    flyingParticles = [];
+    effects = [];
+    comets = [];
+
+    for (const pd of data.planets) {
+        const planet = new Planet(pd.x, pd.y, pd.size, pd.type);
+        planet.owner = pd.owner;
+        planet.units = pd.units;
+        planets.push(planet);
+    }
+
+    // Hide lobby, show game
+    document.getElementById('multiplayerLobby').classList.add('hidden');
+    document.getElementById('menu').classList.add('hidden');
+    document.getElementById('pauseBtn').classList.remove('hidden');
+
+    multiplayerActive = true;
+    lobby.started = true;
+    game.state = 'playing';
+
+    playSound('ability');
+    updateMultiplayerHUD();
+}
+
+function updateMultiplayerHUD() {
+    const myPlayer = lobby.players.find(p => p.id === myPlayerId);
+    const myTeam = myPlayer ? myPlayer.team : 0;
+
+    // Count teams
+    const team0Count = lobby.players.filter(p => p.team === 0).length;
+    const team1Count = lobby.players.filter(p => p.team === 1).length;
+
+    const modeText = mpGameMode === 'coop' ? 'CO-OP' : 'PvP';
+    document.getElementById('levelInfo').textContent =
+        `${modeText} ${team0Count}v${team1Count}`;
+}
+
+// ==================== GAME TICK (HOST-AUTHORITATIVE) ====================
+
+function startGameTickLoop() {
+    if (syncInterval) clearInterval(syncInterval);
+
+    syncInterval = setInterval(() => {
+        if (!multiplayerActive || !isHost || game.state !== 'playing') {
+            clearInterval(syncInterval);
+            return;
+        }
+
+        // Run AI for AI players
+        runMultiplayerAI();
+
+        // Send tick to all clients
+        broadcast({
+            type: 'tick',
+            planets: planets.map(p => ({
+                units: Math.floor(p.units),
+                owner: p.owner,
+                shielded: p.shielded
+            })),
+            flying: flyingParticles.length
+        });
+
+        // Check win condition
+        checkMultiplayerWinCondition();
+
+    }, 100); // 10 ticks per second
+}
+
+function applyGameTick(data) {
+    // Client applies authoritative state from host
+    data.planets.forEach((pd, i) => {
+        if (planets[i]) {
+            // Smooth interpolation for units
+            const diff = pd.units - planets[i].units;
+            planets[i].units += diff * 0.3;
+            planets[i].owner = pd.owner;
+            planets[i].shielded = pd.shielded;
+        }
+    });
+}
+
+function executePlayerCommand(peerId, data) {
+    // Host executes player commands authoritatively
+    const player = lobby.players.find(p => p.id === peerId);
+    if (!player) return;
+
+    const playerTeam = player.team;
+
+    switch(data.cmd) {
+        case 'attack':
+            const source = planets[data.sourceIdx];
+            const target = planets[data.targetIdx];
+
+            // Validate: player must own source planet (team matches)
+            if (!source || !target) return;
+            if (source.owner !== playerTeam) return;
+
+            // Execute attack
+            const units = Math.floor(source.units * (data.percent / 100));
+            if (units < 1) return;
+
+            source.units -= units;
+
+            for (let i = 0; i < units; i++) {
+                setTimeout(() => {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = source.size + 5;
+                    flyingParticles.push(new FlyingParticle(
+                        source.x + Math.cos(angle) * dist,
+                        source.y + Math.sin(angle) * dist,
+                        target,
+                        playerTeam
+                    ));
+                }, i * 25);
+            }
+            break;
+    }
+}
+
+function runMultiplayerAI() {
+    // Run AI for each AI player
+    const aiPlayers = lobby.players.filter(p => p.isAI);
+
+    for (const aiPlayer of aiPlayers) {
+        const team = aiPlayer.team;
+        const settings = DIFFICULTY[game.difficulty];
+
+        // Find AI-controlled planets
+        const aiPlanets = planets.filter(p => p.owner === team && p.units > 8);
+        if (aiPlanets.length === 0) continue;
+
+        // Random chance to act
+        if (Math.random() > settings.aiAggression * 0.3) continue;
+
+        const source = aiPlanets[Math.floor(Math.random() * aiPlanets.length)];
+
+        // Find best target
+        let bestTarget = null;
+        let bestScore = -Infinity;
+
+        for (const planet of planets) {
+            if (planet === source || planet.type === 'blackhole') continue;
+
+            const dist = Math.sqrt((planet.x - source.x) ** 2 + (planet.y - source.y) ** 2);
+            let score = 0;
+
+            if (planet.owner !== team && planet.owner !== -1) {
+                // Enemy planet
+                score = 100 - planet.units - dist / 15;
+                if (planet.shielded) score -= 200;
+            } else if (planet.owner === -1) {
+                // Neutral
+                score = 60 - planet.units - dist / 8;
+            } else {
+                score = -100; // Same team
+            }
+
+            if (score > bestScore) {
+                bestScore = score;
+                bestTarget = planet;
+            }
+        }
+
+        if (bestTarget && bestScore > -30) {
+            const percent = 50 + Math.random() * 30;
+            const units = Math.floor(source.units * (percent / 100));
+            source.units -= units;
+
+            for (let i = 0; i < units; i++) {
+                setTimeout(() => {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = source.size + 5;
+                    flyingParticles.push(new FlyingParticle(
+                        source.x + Math.cos(angle) * dist,
+                        source.y + Math.sin(angle) * dist,
+                        bestTarget,
+                        team
+                    ));
+                }, i * 25);
+            }
         }
     }
 }
 
+function checkMultiplayerWinCondition() {
+    // Count planets per team
+    const teamPlanets = {};
+    const teamFlying = {};
+
+    for (const planet of planets) {
+        if (planet.owner >= 0) {
+            teamPlanets[planet.owner] = (teamPlanets[planet.owner] || 0) + 1;
+        }
+    }
+
+    for (const p of flyingParticles) {
+        teamFlying[p.owner] = (teamFlying[p.owner] || 0) + 1;
+    }
+
+    // Check if team 0 or team 1 has won
+    const team0Total = (teamPlanets[0] || 0) + (teamFlying[0] || 0);
+    const team1Total = (teamPlanets[1] || 0) + (teamFlying[1] || 0);
+
+    if (team0Total === 0) {
+        // Team 1 wins
+        broadcastGameEnd(1);
+    } else if (team1Total === 0) {
+        // Team 0 wins
+        broadcastGameEnd(0);
+    }
+}
+
+function broadcastGameEnd(winningTeam) {
+    const myPlayer = lobby.players.find(p => p.id === myPlayerId);
+    const victory = myPlayer && myPlayer.team === winningTeam;
+
+    broadcast({ type: 'gameEnd', winningTeam, victory });
+    endGame(victory);
+}
+
+// ==================== MAP GENERATION ====================
+
 function generateMultiplayerLevel(seed) {
-    // Simple seeded random
     let s = seed;
     const random = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
 
@@ -2110,156 +2782,134 @@ function generateMultiplayerLevel(seed) {
     effects = [];
     comets = [];
 
-    // Different layout based on game mode
-    if (isCoopMode) {
-        // Co-op: 2 players vs 1 or 2 AI
-        const numPlanets = 10 + (numAIEnemies === 2 ? 2 : 0);
-        const positions = [];
-        const minDist = 120;
-        const margin = 80;
+    // Count players per team
+    const team0Players = lobby.players.filter(p => p.team === 0);
+    const team1Players = lobby.players.filter(p => p.team === 1);
+    const totalPlayers = team0Players.length + team1Players.length;
 
-        for (let i = 0; i < numPlanets; i++) {
-            let x, y, valid;
-            let attempts = 0;
-            do {
-                valid = true;
-                x = margin + random() * (W - margin * 2);
-                y = margin + random() * (H - margin * 2);
-                for (const pos of positions) {
-                    const dx = x - pos.x, dy = y - pos.y;
-                    if (Math.sqrt(dx*dx + dy*dy) < minDist) { valid = false; break; }
-                }
-                attempts++;
-            } while (!valid && attempts < 100);
+    // Scale planets with player count
+    const numPlanets = 8 + (totalPlayers * 2);
+    const positions = [];
+    const minDist = Math.max(80, 130 - totalPlayers * 5);
+    const margin = 70;
 
-            positions.push({ x, y });
-            const size = 25 + random() * 15;
-            const planet = new Planet(x, y, size, 'normal');
-
-            // Co-op layout: Player 1 & 2 get starting planets, AI gets planets
-            if (i === 0 || i === 1) {
-                // Both human players start with planets
-                planet.owner = PLAYER;
-                planet.units = 25;
-            } else if (i === numPlanets - 1 || (numAIEnemies === 2 && i === numPlanets - 2)) {
-                // AI enemies
-                planet.owner = ENEMY;
-                planet.units = 30 + (numAIEnemies === 2 ? 10 : 0);
-            } else {
-                planet.owner = NEUTRAL;
-                planet.units = 10 + Math.floor(random() * 20);
+    for (let i = 0; i < numPlanets; i++) {
+        let x, y, valid;
+        let attempts = 0;
+        do {
+            valid = true;
+            x = margin + random() * (W - margin * 2);
+            y = margin + random() * (H - margin * 2);
+            for (const pos of positions) {
+                const dx = x - pos.x, dy = y - pos.y;
+                if (Math.sqrt(dx*dx + dy*dy) < minDist) { valid = false; break; }
             }
-            planets.push(planet);
-        }
+            attempts++;
+        } while (!valid && attempts < 100);
 
-        document.getElementById('levelInfo').textContent = `CO-OP vs ${numAIEnemies} AI`;
-    } else {
-        // PvP mode - original behavior
-        const numPlanets = 8;
-        const positions = [];
-        const minDist = 130;
-        const margin = 80;
+        positions.push({ x, y });
+        const size = 22 + random() * 18;
+        const planet = new Planet(x, y, size, 'normal');
+        planet.owner = -1; // Neutral by default (using -1 for neutral in MP)
+        planet.units = 8 + Math.floor(random() * 20);
+        planets.push(planet);
+    }
 
-        for (let i = 0; i < numPlanets; i++) {
-            let x, y, valid;
-            let attempts = 0;
-            do {
-                valid = true;
-                x = margin + random() * (W - margin * 2);
-                y = margin + random() * (H - margin * 2);
-                for (const pos of positions) {
-                    const dx = x - pos.x, dy = y - pos.y;
-                    if (Math.sqrt(dx*dx + dy*dy) < minDist) { valid = false; break; }
-                }
-                attempts++;
-            } while (!valid && attempts < 100);
+    // Assign starting planets to each player
+    // Team 0 on left, Team 1 on right
+    const leftPlanets = [...planets].sort((a, b) => a.x - b.x);
+    const rightPlanets = [...planets].sort((a, b) => b.x - a.x);
 
-            positions.push({ x, y });
-            const size = 25 + random() * 15;
-            const planet = new Planet(x, y, size, 'normal');
+    for (let i = 0; i < team0Players.length && i < leftPlanets.length; i++) {
+        leftPlanets[i].owner = 0;
+        leftPlanets[i].units = 25;
+    }
 
-            if (i === 0) {
-                planet.owner = PLAYER;
-                planet.units = 30;
-            } else if (i === numPlanets - 1) {
-                planet.owner = ENEMY;
-                planet.units = 30;
-            } else {
-                planet.owner = NEUTRAL;
-                planet.units = 10 + Math.floor(random() * 20);
-            }
-            planets.push(planet);
-        }
-
-        document.getElementById('levelInfo').textContent = 'PvP MULTIPLAYER';
+    for (let i = 0; i < team1Players.length && i < rightPlanets.length; i++) {
+        rightPlanets[i].owner = 1;
+        rightPlanets[i].units = 25;
     }
 
     game.state = 'playing';
 }
 
-// Co-op AI sync - host runs AI and syncs to guest
-let coopAISyncInterval = null;
+// ==================== CLIENT COMMAND SENDING ====================
 
-function startCoopAISync() {
-    if (coopAISyncInterval) clearInterval(coopAISyncInterval);
+function sendMultiplayerCommand(cmd, data) {
+    if (!multiplayerActive) return;
 
-    coopAISyncInterval = setInterval(() => {
-        if (!multiplayerActive || !isHost || !isCoopMode || game.state !== 'playing') {
-            clearInterval(coopAISyncInterval);
-            return;
+    if (isHost) {
+        // Host executes directly
+        const myPlayer = lobby.players.find(p => p.id === myPlayerId);
+        if (myPlayer) {
+            executePlayerCommand(myPlayerId, { cmd, ...data });
         }
-
-        // Sync planet states to guest
-        sendMultiplayerData({
-            type: 'sync',
-            planets: planets.map(p => ({ units: Math.floor(p.units), owner: p.owner })),
-            flyingCount: flyingParticles.length
-        });
-    }, 200); // Sync 5 times per second
+    } else {
+        // Client sends to host
+        sendToHost({ type: 'command', cmd, ...data });
+    }
 }
+
+// ==================== CLEANUP ====================
 
 function endMultiplayerGame() {
     multiplayerActive = false;
-    if (coopAISyncInterval) {
-        clearInterval(coopAISyncInterval);
-        coopAISyncInterval = null;
+    lobby.started = false;
+    lobby.players = [];
+
+    if (syncInterval) {
+        clearInterval(syncInterval);
+        syncInterval = null;
     }
-    if (peer) peer.destroy();
-    peer = null;
-    conn = null;
-    isCoopMode = false;
+    if (pingInterval) {
+        clearInterval(pingInterval);
+        pingInterval = null;
+    }
+
+    connections.clear();
+    hostConnection = null;
+
+    if (peer) {
+        peer.destroy();
+        peer = null;
+    }
+
     document.getElementById('multiplayerLobby').classList.add('hidden');
+    document.getElementById('lobbyRoom').classList.add('hidden');
+    document.getElementById('lobbyInitial').classList.remove('hidden');
 }
 
-function showMultiplayerLobby(hosting) {
+function showMultiplayerLobby() {
     const lobby = document.getElementById('multiplayerLobby');
     lobby.classList.remove('hidden');
     document.getElementById('menu').classList.add('hidden');
+    document.getElementById('lobbyRoom').classList.add('hidden');
+    document.getElementById('lobbyInitial').classList.remove('hidden');
+    document.getElementById('lobbyStatus').textContent = 'Choose an option';
+    document.getElementById('joinCodeInput').value = '';
+}
 
-    // Show/hide game mode options based on hosting
-    const gameModeContainer = document.getElementById('gameModeContainer');
-    const aiCountContainer = document.getElementById('aiCountContainer');
+// Helper for checking team alliance
+function isAlly(team1, team2) {
+    return team1 === team2;
+}
 
-    if (hosting) {
-        document.getElementById('lobbyTitle').textContent = 'Hosting Game';
-        document.getElementById('roomCodeDisplay').textContent = roomCode;
-        document.getElementById('roomCodeDisplay').parentElement.classList.remove('hidden');
-        document.getElementById('joinCodeInput').parentElement.classList.add('hidden');
-        document.getElementById('lobbyStatus').textContent = 'Waiting for opponent...';
-        // Show game mode options for host
-        gameModeContainer.classList.remove('hidden');
-        // Reset to default PvP mode
-        mpGameMode = 'pvp';
-        isCoopMode = false;
-        document.querySelectorAll('.mode-toggle-btn').forEach(b => {
-            b.classList.toggle('active', b.dataset.mpmode === 'pvp');
-        });
-        aiCountContainer.classList.add('hidden');
-    } else {
-        // Hide game mode options for guest (they receive mode from host)
-        gameModeContainer.classList.add('hidden');
-        aiCountContainer.classList.add('hidden');
+// Check if planet is owned by my team
+function isMyPlanet(planet) {
+    if (multiplayerActive) {
+        const myPlayer = lobby.players.find(p => p.id === myPlayerId);
+        return myPlayer && planet.owner === myPlayer.team;
     }
+    return planet.owner === PLAYER;
+}
+
+// Get my team number
+function getMyTeam() {
+    if (multiplayerActive) {
+        const myPlayer = lobby.players.find(p => p.id === myPlayerId);
+        return myPlayer ? myPlayer.team : 0;
+    }
+    return PLAYER;
 }
 
 // Game state
@@ -2796,6 +3446,35 @@ const COLORS = {
     [ENEMY]: { main: '#ff4444', glow: '#ff2222', particle: '#ff6666' }
 };
 
+// Team colors for multiplayer (indexes 0-3 for teams, -1 for neutral)
+const MP_COLORS = {
+    [-1]: { main: '#666666', glow: '#444444', particle: '#888888' }, // Neutral
+    [0]: { main: '#00ffff', glow: '#00aaff', particle: '#00ffff' },  // Cyan (Team 1)
+    [1]: { main: '#ff4444', glow: '#ff2222', particle: '#ff6666' },  // Red (Team 2)
+    [2]: { main: '#ff9900', glow: '#ff7700', particle: '#ffaa44' },  // Orange (Team 3)
+    [3]: { main: '#aa44ff', glow: '#8822ff', particle: '#bb66ff' }   // Purple (Team 4)
+};
+
+// Get color based on owner (works in both single player and multiplayer)
+function getOwnerColor(owner) {
+    if (multiplayerActive) {
+        return MP_COLORS[owner] || MP_COLORS[-1];
+    }
+    return COLORS[owner] || COLORS[NEUTRAL];
+}
+
+// Get team label for display
+function getTeamLabel(owner) {
+    if (multiplayerActive) {
+        const myPlayer = lobby.players.find(p => p.id === myPlayerId);
+        if (myPlayer && myPlayer.team === owner) return 'YOU';
+        return owner >= 0 ? `T${owner + 1}` : '';
+    }
+    if (owner === PLAYER) return 'YOU';
+    if (owner === ENEMY) return 'AI';
+    return '';
+}
+
 let planets = [];
 let flyingParticles = [];
 let bgParticles = [];
@@ -3068,14 +3747,15 @@ class Planet {
         ctx.stroke();
         
         // OWNERSHIP RING
-        if (this.owner !== NEUTRAL) {
-            const ownerColor = COLORS[this.owner].main;
+        const isOwned = multiplayerActive ? this.owner >= 0 : this.owner !== NEUTRAL;
+        if (isOwned) {
+            const ownerColor = getOwnerColor(this.owner).main;
             ctx.strokeStyle = ownerColor;
             ctx.lineWidth = 4;
             ctx.beginPath();
             ctx.arc(this.x, this.y, this.size + 6, 0, Math.PI * 2);
             ctx.stroke();
-            
+
             ctx.strokeStyle = hexToRgba(ownerColor, 0.4);
             ctx.lineWidth = 8;
             ctx.beginPath();
@@ -3126,7 +3806,7 @@ class Planet {
         }
         
         // Incoming attack warning
-        if (this.incomingAttacks.length > 0 && this.owner === PLAYER) {
+        if (this.incomingAttacks.length > 0 && isMyPlanet(this)) {
             const warningPulse = (Math.sin(Date.now() / 100) + 1) / 2;
             ctx.strokeStyle = `rgba(255, 100, 100, ${0.3 + warningPulse * 0.5})`;
             ctx.lineWidth = 3;
@@ -3164,7 +3844,7 @@ class Planet {
         }
         
         // Orbiting particles
-        const orbitColor = COLORS[this.owner].particle;
+        const orbitColor = getOwnerColor(this.owner).particle;
         ctx.fillStyle = orbitColor;
         for (const p of this.orbitParticles) {
             const px = this.x + Math.cos(p.angle) * p.distance;
@@ -3190,14 +3870,11 @@ class Planet {
         }
         
         // Ownership label
-        if (this.owner === PLAYER) {
-            ctx.fillStyle = COLORS[PLAYER].main;
+        const teamLabel = getTeamLabel(this.owner);
+        if (teamLabel) {
+            ctx.fillStyle = getOwnerColor(this.owner).main;
             ctx.font = 'bold 10px system-ui';
-            ctx.fillText('YOU', this.x, this.y + this.size + 18);
-        } else if (this.owner === ENEMY) {
-            ctx.fillStyle = COLORS[ENEMY].main;
-            ctx.font = 'bold 10px system-ui';
-            ctx.fillText('AI', this.x, this.y + this.size + 18);
+            ctx.fillText(teamLabel, this.x, this.y + this.size + 18);
         }
     }
     
@@ -3222,7 +3899,10 @@ class FlyingParticle {
     
     get speed() {
         let spd = this.baseSpeed;
-        if (this.owner === PLAYER && abilities.boost.active) spd *= 3;
+        const isMyTeam = multiplayerActive
+            ? lobby.players.find(p => p.id === myPlayerId)?.team === this.owner
+            : this.owner === PLAYER;
+        if (isMyTeam && abilities.boost.active) spd *= 3;
         return spd;
     }
     
@@ -3277,22 +3957,30 @@ class FlyingParticle {
                     this.target.units = 1;
 
                     // Track capture stats and play sounds
-                    if (this.owner === PLAYER) {
+                    const isMyTeam = multiplayerActive
+                        ? lobby.players.find(p => p.id === myPlayerId)?.team === this.owner
+                        : this.owner === PLAYER;
+                    const wasMyTeam = multiplayerActive
+                        ? lobby.players.find(p => p.id === myPlayerId)?.team === prevOwner
+                        : prevOwner === PLAYER;
+
+                    if (isMyTeam) {
                         playerStats.planetsConquered++;
                         playSound('capture');
                         // Capture juice!
+                        const teamColor = getOwnerColor(this.owner).main;
                         juice.shake(12, 200);
-                        juice.burst(this.target.x, this.target.y, '#0ff', 25, 120);
-                        juice.flash('#0ff', 0.2);
+                        juice.burst(this.target.x, this.target.y, teamColor, 25, 120);
+                        juice.flash(teamColor, 0.2);
                         haptics.heavy();
 
                         // Check if all planets owned for daily challenge
-                        if (planets.every(p => p.owner === PLAYER)) {
+                        if (!multiplayerActive && planets.every(p => p.owner === PLAYER)) {
                             currentGameStats.allPlanetsOwned = true;
                         }
                         // Check achievements after capture
                         achievements.check();
-                    } else if (prevOwner === PLAYER) {
+                    } else if (wasMyTeam) {
                         playerStats.planetsLost++;
                         currentGameStats.perfectWin = false;
                         currentGameStats.planetsLostThisGame++;
@@ -3329,8 +4017,11 @@ class FlyingParticle {
     }
     
     draw() {
-        const color = COLORS[this.owner];
-        const isStealthed = this.stealthTime > 0 && this.owner === PLAYER;
+        const color = getOwnerColor(this.owner);
+        const isMyTeam = multiplayerActive
+            ? lobby.players.find(p => p.id === myPlayerId)?.team === this.owner
+            : this.owner === PLAYER;
+        const isStealthed = this.stealthTime > 0 && isMyTeam;
 
         // If stealthed, draw with ghostly effect
         const stealthAlpha = isStealthed ? 0.3 : 1;
@@ -3344,7 +4035,7 @@ class FlyingParticle {
             ctx.fill();
         }
 
-        if (this.owner === PLAYER && abilities.boost.active) {
+        if (isMyTeam && abilities.boost.active) {
             ctx.fillStyle = `rgba(255, 240, 0, ${0.5 * stealthAlpha})`;
             ctx.beginPath();
             ctx.arc(this.x, this.y, 10, 0, Math.PI * 2);
@@ -3634,7 +4325,10 @@ function updateSelectionIndicator() {
 }
 
 function selectAllPlayerPlanets() {
-    game.selectedPlanets = planets.filter(p => p.owner === PLAYER && p.units >= 1);
+    const myTeam = multiplayerActive
+        ? lobby.players.find(p => p.id === myPlayerId)?.team
+        : PLAYER;
+    game.selectedPlanets = planets.filter(p => p.owner === myTeam && p.units >= 1);
     
     // Visual feedback
     for (const planet of game.selectedPlanets) {
@@ -3908,16 +4602,16 @@ function sendUnifiedAttack(target, percent) {
 
     for (const planet of game.selectedPlanets) {
         if (planet !== target && planet.units >= 1) {
-            sendUnits(planet, target, percent);
-
-            // Send attack to multiplayer peer
             if (multiplayerActive) {
-                sendMultiplayerData({
-                    type: 'attack',
+                // In multiplayer: send command to host (host-authoritative)
+                sendMultiplayerCommand('attack', {
                     sourceIdx: planets.indexOf(planet),
                     targetIdx: planets.indexOf(target),
                     percent: percent
                 });
+            } else {
+                // Single player: execute locally
+                sendUnits(planet, target, percent);
             }
         }
     }
@@ -4375,7 +5069,7 @@ function drawFogOfWar() {
 
     // Cut visibility around player planets
     for (const planet of planets) {
-        if (planet.owner === PLAYER) {
+        if (isMyPlanet(planet)) {
             const visRadius = planet.size * 6;
             const gradient = fogCtx.createRadialGradient(
                 planet.x, planet.y, planet.size * 0.5,
@@ -4392,8 +5086,9 @@ function drawFogOfWar() {
     }
 
     // Also reveal around player's flying particles
+    const myTeam = getMyTeam();
     for (const p of flyingParticles) {
-        if (p.owner === PLAYER) {
+        if (p.owner === myTeam) {
             const visRadius = 80;
             const gradient = fogCtx.createRadialGradient(
                 p.x, p.y, 5,
@@ -4578,9 +5273,9 @@ function handleStart(x, y) {
     if (game.state === 'harvest') {
         if (selectedHarvestParticle && !selectedHarvestParticle.grabbed) {
             for (const planet of planets) {
-                if (planet.containsPoint(x, y) && planet.owner === PLAYER) {
+                if (planet.containsPoint(x, y) && isMyPlanet(planet)) {
                     selectedHarvestParticle.grabbed = true;
-                    selectedHarvestParticle.grabbedBy = PLAYER;
+                    selectedHarvestParticle.grabbedBy = getMyTeam();
                     selectedHarvestParticle.targetPlanet = planet;
                     playerHarvested++;
                     updateHarvestUI();
@@ -4622,7 +5317,7 @@ function handleStart(x, y) {
     // Check for planet clicks
     for (const planet of planets) {
         if (planet.containsPoint(x, y)) {
-            if (planet.owner === PLAYER) {
+            if (isMyPlanet(planet)) {
                 // Check for double-click
                 const isDoubleClick = (now - game.lastClickTime < game.doubleClickThreshold) && 
                                       game.lastClickedPlanet === planet;
@@ -4867,7 +5562,6 @@ document.getElementById('lobbyBackBtn').addEventListener('click', () => {
 });
 
 document.getElementById('lobbyHostBtn').addEventListener('click', () => {
-    playSound('click');
     document.getElementById('lobbyStatus').textContent = 'Creating room...';
     hostGame();
 });
@@ -4878,37 +5572,36 @@ document.getElementById('lobbyJoinBtn').addEventListener('click', () => {
         showFloatText(W / 2, H / 2, 'Enter 6-character code', '#f44');
         return;
     }
-    playSound('click');
     document.getElementById('lobbyStatus').textContent = 'Connecting...';
     joinGame(code);
+});
+
+// Lobby room event handlers
+document.getElementById('lobbyLeaveBtn')?.addEventListener('click', () => {
+    playSound('click');
+    endMultiplayerGame();
+    document.getElementById('menu').classList.remove('hidden');
+});
+
+document.getElementById('switchTeamBtn')?.addEventListener('click', () => {
+    switchTeam();
+});
+
+document.getElementById('startGameBtn')?.addEventListener('click', () => {
+    startMultiplayerGame();
 });
 
 // Game mode toggle (PvP vs Co-op)
 document.querySelectorAll('.mode-toggle-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        playSound('click');
-        document.querySelectorAll('.mode-toggle-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        mpGameMode = btn.dataset.mpmode;
-        isCoopMode = (mpGameMode === 'coop');
-
-        // Show/hide AI count container
-        const aiContainer = document.getElementById('aiCountContainer');
-        if (isCoopMode) {
-            aiContainer.classList.remove('hidden');
-        } else {
-            aiContainer.classList.add('hidden');
-        }
+        setGameMode(btn.dataset.mpmode);
     });
 });
 
-// AI count selection (for co-op mode)
-document.querySelectorAll('.ai-count-btn').forEach(btn => {
+// Add AI buttons
+document.querySelectorAll('.add-ai-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-        playSound('click');
-        document.querySelectorAll('.ai-count-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        numAIEnemies = parseInt(btn.dataset.ai);
+        addAI(parseInt(btn.dataset.team));
     });
 });
 
