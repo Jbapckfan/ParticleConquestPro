@@ -825,6 +825,43 @@
             font-weight: bold;
         }
 
+        .lobby-section {
+            margin-bottom: 20px;
+        }
+
+        .mode-toggle-btns {
+            display: flex;
+            gap: 10px;
+        }
+
+        .mode-toggle-btn, .ai-count-btn {
+            padding: 10px 20px;
+            font-size: 14px;
+            background: #111;
+            border: 2px solid #444;
+            color: #888;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .mode-toggle-btn:hover, .ai-count-btn:hover {
+            border-color: #666;
+            color: #fff;
+        }
+
+        .mode-toggle-btn.active {
+            background: rgba(0, 255, 255, 0.15);
+            border-color: #0ff;
+            color: #0ff;
+        }
+
+        .ai-count-btn.active {
+            background: rgba(255, 68, 68, 0.15);
+            border-color: #f44;
+            color: #f44;
+        }
+
         /* Menu buttons for new features */
         .menu-actions {
             display: flex;
@@ -1258,9 +1295,27 @@
         <h1 id="lobbyTitle">🌐 Multiplayer</h1>
         <p class="lobby-status" id="lobbyStatus">Choose an option</p>
 
+        <!-- Game Mode Selection -->
+        <div id="gameModeContainer" class="lobby-section">
+            <p style="color:#888; font-size:12px; margin-bottom:10px;">Game Mode</p>
+            <div class="mode-toggle-btns">
+                <button class="mode-toggle-btn active" data-mpmode="pvp">⚔️ PvP</button>
+                <button class="mode-toggle-btn" data-mpmode="coop">🤝 Co-op vs AI</button>
+            </div>
+        </div>
+
+        <!-- AI Count (only shown in co-op mode) -->
+        <div id="aiCountContainer" class="lobby-section hidden">
+            <p style="color:#888; font-size:12px; margin-bottom:10px;">Number of AI Opponents</p>
+            <div class="mode-toggle-btns">
+                <button class="ai-count-btn active" data-ai="1">1 AI</button>
+                <button class="ai-count-btn" data-ai="2">2 AIs</button>
+            </div>
+        </div>
+
         <div id="roomCodeContainer" class="hidden">
             <div class="room-code-display" id="roomCodeDisplay">------</div>
-            <p style="color:#888; font-size:12px;">Share this code with your friend</p>
+            <p style="color:#888; font-size:12px;">Share this code with your teammate</p>
         </div>
 
         <div id="joinCodeContainer">
@@ -1807,6 +1862,9 @@ let isHost = false;
 let multiplayerActive = false;
 let opponentName = 'Opponent';
 let roomCode = '';
+let isCoopMode = false;
+let numAIEnemies = 1;
+let mpGameMode = 'pvp'; // 'pvp' or 'coop'
 
 function generateRoomCode() {
     const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -1834,6 +1892,7 @@ async function hostGame() {
     try {
         await initPeerJS();
         roomCode = generateRoomCode();
+        isCoopMode = mpGameMode === 'coop';
         peer = new Peer('pcp-' + roomCode);
 
         peer.on('open', id => {
@@ -1909,17 +1968,23 @@ function sendMultiplayerData(data) {
 function handleMultiplayerData(data) {
     switch(data.type) {
         case 'gameState':
-            // Sync game state from host
+            // Sync game state from host (includes mode info)
             if (!isHost) {
+                isCoopMode = data.isCoopMode || false;
+                numAIEnemies = data.numAIEnemies || 1;
                 syncGameState(data.state);
             }
             break;
         case 'attack':
-            // Opponent sent an attack
-            executeOpponentAttack(data);
+            // Teammate or opponent sent an attack
+            if (isCoopMode) {
+                executeTeammateAttack(data);
+            } else {
+                executeOpponentAttack(data);
+            }
             break;
         case 'ability':
-            // Opponent used an ability
+            // Opponent/teammate used an ability
             executeOpponentAbility(data);
             break;
         case 'sync':
@@ -1951,6 +2016,7 @@ function syncPlanets(planetData) {
 }
 
 function executeOpponentAttack(data) {
+    // PvP mode: opponent attacks as ENEMY
     const source = planets[data.sourceIdx];
     const target = planets[data.targetIdx];
     if (source && target) {
@@ -1971,9 +2037,37 @@ function executeOpponentAttack(data) {
     }
 }
 
+function executeTeammateAttack(data) {
+    // Co-op mode: teammate attacks as PLAYER (same team)
+    const source = planets[data.sourceIdx];
+    const target = planets[data.targetIdx];
+    if (source && target) {
+        const units = Math.floor(source.units * (data.percent / 100));
+        source.units -= units;
+        playSound('attack');
+        juice.shake(3, 80);
+        for (let i = 0; i < units; i++) {
+            setTimeout(() => {
+                const angle = Math.random() * Math.PI * 2;
+                const dist = source.size + 5;
+                flyingParticles.push(new FlyingParticle(
+                    source.x + Math.cos(angle) * dist,
+                    source.y + Math.sin(angle) * dist,
+                    target,
+                    PLAYER
+                ));
+            }, i * 30);
+        }
+    }
+}
+
 function executeOpponentAbility(data) {
-    // Handle opponent ability usage
-    showFloatText(W / 2, 100, `Opponent used ${data.ability}!`, '#f44');
+    // Handle opponent/teammate ability usage
+    if (isCoopMode) {
+        showFloatText(W / 2, 100, `Teammate used ${data.ability}!`, '#0ff');
+    } else {
+        showFloatText(W / 2, 100, `Opponent used ${data.ability}!`, '#f44');
+    }
 }
 
 function startMultiplayerGame() {
@@ -1987,15 +2081,22 @@ function startMultiplayerGame() {
     generateMultiplayerLevel(mpSeed);
 
     if (isHost) {
-        // Send initial state to opponent
+        // Send initial state to opponent (including game mode info)
         setTimeout(() => {
             sendMultiplayerData({
                 type: 'gameState',
+                isCoopMode: isCoopMode,
+                numAIEnemies: numAIEnemies,
                 state: {
-                    planets: planets.map(p => ({ units: p.units, owner: p.owner, x: p.x, y: p.y }))
+                    planets: planets.map(p => ({ units: p.units, owner: p.owner, x: p.x, y: p.y, size: p.size }))
                 }
             });
         }, 500);
+
+        // If co-op mode, start AI sync loop
+        if (isCoopMode) {
+            startCoopAISync();
+        }
     }
 }
 
@@ -2009,51 +2110,124 @@ function generateMultiplayerLevel(seed) {
     effects = [];
     comets = [];
 
-    const numPlanets = 8;
-    const positions = [];
-    const minDist = 130;
-    const margin = 80;
+    // Different layout based on game mode
+    if (isCoopMode) {
+        // Co-op: 2 players vs 1 or 2 AI
+        const numPlanets = 10 + (numAIEnemies === 2 ? 2 : 0);
+        const positions = [];
+        const minDist = 120;
+        const margin = 80;
 
-    for (let i = 0; i < numPlanets; i++) {
-        let x, y, valid;
-        let attempts = 0;
-        do {
-            valid = true;
-            x = margin + random() * (W - margin * 2);
-            y = margin + random() * (H - margin * 2);
-            for (const pos of positions) {
-                const dx = x - pos.x, dy = y - pos.y;
-                if (Math.sqrt(dx*dx + dy*dy) < minDist) { valid = false; break; }
+        for (let i = 0; i < numPlanets; i++) {
+            let x, y, valid;
+            let attempts = 0;
+            do {
+                valid = true;
+                x = margin + random() * (W - margin * 2);
+                y = margin + random() * (H - margin * 2);
+                for (const pos of positions) {
+                    const dx = x - pos.x, dy = y - pos.y;
+                    if (Math.sqrt(dx*dx + dy*dy) < minDist) { valid = false; break; }
+                }
+                attempts++;
+            } while (!valid && attempts < 100);
+
+            positions.push({ x, y });
+            const size = 25 + random() * 15;
+            const planet = new Planet(x, y, size, 'normal');
+
+            // Co-op layout: Player 1 & 2 get starting planets, AI gets planets
+            if (i === 0 || i === 1) {
+                // Both human players start with planets
+                planet.owner = PLAYER;
+                planet.units = 25;
+            } else if (i === numPlanets - 1 || (numAIEnemies === 2 && i === numPlanets - 2)) {
+                // AI enemies
+                planet.owner = ENEMY;
+                planet.units = 30 + (numAIEnemies === 2 ? 10 : 0);
+            } else {
+                planet.owner = NEUTRAL;
+                planet.units = 10 + Math.floor(random() * 20);
             }
-            attempts++;
-        } while (!valid && attempts < 100);
-
-        positions.push({ x, y });
-        const size = 25 + random() * 15;
-        const planet = new Planet(x, y, size, 'normal');
-
-        if (i === 0) {
-            planet.owner = PLAYER;
-            planet.units = 30;
-        } else if (i === numPlanets - 1) {
-            planet.owner = ENEMY;
-            planet.units = 30;
-        } else {
-            planet.owner = NEUTRAL;
-            planet.units = 10 + Math.floor(random() * 20);
+            planets.push(planet);
         }
-        planets.push(planet);
+
+        document.getElementById('levelInfo').textContent = `CO-OP vs ${numAIEnemies} AI`;
+    } else {
+        // PvP mode - original behavior
+        const numPlanets = 8;
+        const positions = [];
+        const minDist = 130;
+        const margin = 80;
+
+        for (let i = 0; i < numPlanets; i++) {
+            let x, y, valid;
+            let attempts = 0;
+            do {
+                valid = true;
+                x = margin + random() * (W - margin * 2);
+                y = margin + random() * (H - margin * 2);
+                for (const pos of positions) {
+                    const dx = x - pos.x, dy = y - pos.y;
+                    if (Math.sqrt(dx*dx + dy*dy) < minDist) { valid = false; break; }
+                }
+                attempts++;
+            } while (!valid && attempts < 100);
+
+            positions.push({ x, y });
+            const size = 25 + random() * 15;
+            const planet = new Planet(x, y, size, 'normal');
+
+            if (i === 0) {
+                planet.owner = PLAYER;
+                planet.units = 30;
+            } else if (i === numPlanets - 1) {
+                planet.owner = ENEMY;
+                planet.units = 30;
+            } else {
+                planet.owner = NEUTRAL;
+                planet.units = 10 + Math.floor(random() * 20);
+            }
+            planets.push(planet);
+        }
+
+        document.getElementById('levelInfo').textContent = 'PvP MULTIPLAYER';
     }
 
     game.state = 'playing';
-    document.getElementById('levelInfo').textContent = 'MULTIPLAYER';
+}
+
+// Co-op AI sync - host runs AI and syncs to guest
+let coopAISyncInterval = null;
+
+function startCoopAISync() {
+    if (coopAISyncInterval) clearInterval(coopAISyncInterval);
+
+    coopAISyncInterval = setInterval(() => {
+        if (!multiplayerActive || !isHost || !isCoopMode || game.state !== 'playing') {
+            clearInterval(coopAISyncInterval);
+            return;
+        }
+
+        // Sync planet states to guest
+        sendMultiplayerData({
+            type: 'sync',
+            planets: planets.map(p => ({ units: Math.floor(p.units), owner: p.owner })),
+            flyingCount: flyingParticles.length
+        });
+    }, 200); // Sync 5 times per second
 }
 
 function endMultiplayerGame() {
     multiplayerActive = false;
+    if (coopAISyncInterval) {
+        clearInterval(coopAISyncInterval);
+        coopAISyncInterval = null;
+    }
     if (peer) peer.destroy();
     peer = null;
     conn = null;
+    isCoopMode = false;
     document.getElementById('multiplayerLobby').classList.add('hidden');
 }
 
@@ -2062,12 +2236,29 @@ function showMultiplayerLobby(hosting) {
     lobby.classList.remove('hidden');
     document.getElementById('menu').classList.add('hidden');
 
+    // Show/hide game mode options based on hosting
+    const gameModeContainer = document.getElementById('gameModeContainer');
+    const aiCountContainer = document.getElementById('aiCountContainer');
+
     if (hosting) {
         document.getElementById('lobbyTitle').textContent = 'Hosting Game';
         document.getElementById('roomCodeDisplay').textContent = roomCode;
         document.getElementById('roomCodeDisplay').parentElement.classList.remove('hidden');
         document.getElementById('joinCodeInput').parentElement.classList.add('hidden');
         document.getElementById('lobbyStatus').textContent = 'Waiting for opponent...';
+        // Show game mode options for host
+        gameModeContainer.classList.remove('hidden');
+        // Reset to default PvP mode
+        mpGameMode = 'pvp';
+        isCoopMode = false;
+        document.querySelectorAll('.mode-toggle-btn').forEach(b => {
+            b.classList.toggle('active', b.dataset.mpmode === 'pvp');
+        });
+        aiCountContainer.classList.add('hidden');
+    } else {
+        // Hide game mode options for guest (they receive mode from host)
+        gameModeContainer.classList.add('hidden');
+        aiCountContainer.classList.add('hidden');
     }
 }
 
@@ -3718,6 +3909,16 @@ function sendUnifiedAttack(target, percent) {
     for (const planet of game.selectedPlanets) {
         if (planet !== target && planet.units >= 1) {
             sendUnits(planet, target, percent);
+
+            // Send attack to multiplayer peer
+            if (multiplayerActive) {
+                sendMultiplayerData({
+                    type: 'attack',
+                    sourceIdx: planets.indexOf(planet),
+                    targetIdx: planets.indexOf(target),
+                    percent: percent
+                });
+            }
         }
     }
 
@@ -4315,7 +4516,13 @@ function animate(time) {
                 }
             }
 
-            updateAI(dt);
+            // Run AI only when appropriate:
+            // - Single player: always
+            // - Co-op multiplayer: only on host
+            // - PvP multiplayer: never
+            if (!multiplayerActive || (isCoopMode && isHost)) {
+                updateAI(dt);
+            }
             updateAbilities(realDt);
             checkWinCondition();
             updateStats();
@@ -4674,6 +4881,35 @@ document.getElementById('lobbyJoinBtn').addEventListener('click', () => {
     playSound('click');
     document.getElementById('lobbyStatus').textContent = 'Connecting...';
     joinGame(code);
+});
+
+// Game mode toggle (PvP vs Co-op)
+document.querySelectorAll('.mode-toggle-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        playSound('click');
+        document.querySelectorAll('.mode-toggle-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        mpGameMode = btn.dataset.mpmode;
+        isCoopMode = (mpGameMode === 'coop');
+
+        // Show/hide AI count container
+        const aiContainer = document.getElementById('aiCountContainer');
+        if (isCoopMode) {
+            aiContainer.classList.remove('hidden');
+        } else {
+            aiContainer.classList.add('hidden');
+        }
+    });
+});
+
+// AI count selection (for co-op mode)
+document.querySelectorAll('.ai-count-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        playSound('click');
+        document.querySelectorAll('.ai-count-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        numAIEnemies = parseInt(btn.dataset.ai);
+    });
 });
 
 // Initialize audio on first interaction
